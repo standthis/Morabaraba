@@ -1,47 +1,4 @@
 ﻿// Learn more about F# at http://fsharp.org
-(*  let board = [{Pos=('A',1);Layer=3;Status=None};
-                 {Pos=('A',4);Layer=3;Status=None}; 
-                 {Pos=('A',7);Layer=3;Status=None;}
-                 {Pos=('B',2);Layer=2;Status=None};
-                 {Pos=('B',4);Layer=2;Status=None};
-                 {Pos=('B',6);Layer=2;Status=None};
-                 {Pos=('C',3);Layer=1;Status=None};
-                 {Pos=('C',4);Layer=1;Status=None};
-                 {Pos=('C',5);Layer=1;Status=None};
-                 {Pos=('D',1);Layer=3;Status=None};
-                 {Pos=('D',2);Layer=2;Status=None};
-                 {Pos=('D',3);Layer=1;Status=None};
-                 {Pos=('D',5);Layer=1;Status=None};
-                 {Pos=('D',6);Layer=2;Status=None};
-                 {Pos=('D',7);Layer=3;Status=None};
-                 {Pos=('E',3);Layer=1;Status=None};
-                 {Pos=('E',4);Layer=1;Status=None};
-                 {Pos=('E',5);Layer=1;Status=None};
-                 {Pos=('F',2);Layer=2;Status=None};
-                 {Pos=('F',4);Layer=2;Status=None};
-                 {Pos=('F',6);Layer=2;Status=None};
-                 {Pos=('G',1);Layer=3;Status=None};
-                 {Pos=('G',4);Layer=3;Status=None}; 
-
- let rec check (checkList:Coords list) (coord:char*int) =  //checks checkList to see if coord is in checkList
-     match checkList with
-     | [] -> false
-     | a::rest ->
-           match a.Pos=coord with
-           | true -> true
-           | _ -> check rest coord
-  
- let rec bigCheck (xs:Coords list) (out:Coords list) =
-      match xs with
-      | [] -> out
-      | a::rest -> 
-          match check playerPositions a.Pos with
-          | true -> bigCheck rest out
-          | _ -> bigCheck rest (out@[a])
- bigCheck startBoard []
-
-
-                 *)
 open System
  type Coords={
        Pos: char * int
@@ -181,7 +138,7 @@ module Game =
     let getPlayerMove (player:Player) : (char*int) =
         match player.PlayerState with
         | PLACING -> 
-            printfn "%s's turn" player.Name
+            printfn "%s's turn(%d pieces left)" player.Name player.NumberOfPieces
             printf "Row:" 
             let row= Console.ReadLine().[0];
             printf "Column: " 
@@ -209,13 +166,11 @@ module Game =
         let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
         printBoard currentBoard //print the board
         let availableBoard = getAvailableBoard (players.[0].Positions @ players.[1].Positions); //the avaialble positions
-       // printBoard currentBoard
-     
         let pos= getPlayerMove players.[0]//the positon the player wants to move to
         let updatedPlayer=
             match makeMove pos players.[0] availableBoard currentBoard with
             | true -> 
-                       addPiece players.[0] (getCoords (players.[0].Symbol) pos)  //move was valid
+                       addPiece players.[0] (getCoords (players.[0].Symbol) pos) |> decrementPieces  //move was valid
                        //use piping when using more functions on the player
                       
             | _ ->
