@@ -1,0 +1,8 @@
+/Users/Martin/Projects/Morabaraba/Morabaraba/bin/Debug/netcoreapp2.0/Morabaraba.deps.json
+/Users/Martin/Projects/Morabaraba/Morabaraba/bin/Debug/netcoreapp2.0/Morabaraba.runtimeconfig.json
+/Users/Martin/Projects/Morabaraba/Morabaraba/bin/Debug/netcoreapp2.0/Morabaraba.runtimeconfig.dev.json
+/Users/Martin/Projects/Morabaraba/Morabaraba/bin/Debug/netcoreapp2.0/Morabaraba.dll
+/Users/Martin/Projects/Morabaraba/Morabaraba/bin/Debug/netcoreapp2.0/Morabaraba.pdb
+/Users/Martin/Projects/Morabaraba/Morabaraba/obj/Debug/netcoreapp2.0/Morabaraba.fsprojResolveAssemblyReference.cache
+/Users/Martin/Projects/Morabaraba/Morabaraba/obj/Debug/netcoreapp2.0/Morabaraba.dll
+/Users/Martin/Projects/Morabaraba/Morabaraba/obj/Debug/netcoreapp2.0/Morabaraba.pdb
