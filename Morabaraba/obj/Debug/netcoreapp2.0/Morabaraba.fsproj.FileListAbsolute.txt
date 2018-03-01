@@ -6,3 +6,11 @@
 /Users/Martin/Projects/Morabaraba/Morabaraba/obj/Debug/netcoreapp2.0/Morabaraba.fsprojResolveAssemblyReference.cache
 /Users/Martin/Projects/Morabaraba/Morabaraba/obj/Debug/netcoreapp2.0/Morabaraba.dll
 /Users/Martin/Projects/Morabaraba/Morabaraba/obj/Debug/netcoreapp2.0/Morabaraba.pdb
+J:\Morabaraba\Morabaraba\Morabaraba\bin\Debug\netcoreapp2.0\Morabaraba.deps.json
+J:\Morabaraba\Morabaraba\Morabaraba\bin\Debug\netcoreapp2.0\Morabaraba.runtimeconfig.json
+J:\Morabaraba\Morabaraba\Morabaraba\bin\Debug\netcoreapp2.0\Morabaraba.runtimeconfig.dev.json
+J:\Morabaraba\Morabaraba\Morabaraba\bin\Debug\netcoreapp2.0\Morabaraba.dll
+J:\Morabaraba\Morabaraba\Morabaraba\bin\Debug\netcoreapp2.0\Morabaraba.pdb
+J:\Morabaraba\Morabaraba\Morabaraba\obj\Debug\netcoreapp2.0\Morabaraba.fsprojResolveAssemblyReference.cache
+J:\Morabaraba\Morabaraba\Morabaraba\obj\Debug\netcoreapp2.0\Morabaraba.dll
+J:\Morabaraba\Morabaraba\Morabaraba\obj\Debug\netcoreapp2.0\Morabaraba.pdb

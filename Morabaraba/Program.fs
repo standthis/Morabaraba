@@ -120,6 +120,8 @@ let getAvailableBoard (playerPositions:(Coords list)) = //returns are board with
         | []->out
         | a::rest-> filterOut rest (List.filter (fun x -> x.Pos<>a.Pos ) out )
     filterOut playerPositions startBoard  //filterOut
+
+
 let getCurrentBoard (playerPositions:(Coords list))  =
     let rec changeBoard (xs:Coords list) (out:Coords list) = 
         match xs with
@@ -148,13 +150,13 @@ let getPlayerMove (player:Player) : (char*int) =
     | FLYING -> ('A',0) //placeholder
    // | _ -> failwith "Game is bugged!"
    
-let makeMove (coord:char*int) (player:Player) availableBoard currentBoard= //try make a move using the avaible board
+let makeMove (coord:char*int) (player:Player) availableBoard = //try make a move using the avaible board
     let length=(List.filter (fun x -> x.Pos=coord) availableBoard).Length;
-    //if the length is not 0 this means a position that you tried to move to was taking
+    //if the length is not 0 this means a position that you tried to move to was taken
     length<>0
     
 
-//  getAvailableBoard 
+  //getAvailableBoard 
   //get the avaibleBoard given both player lists of positions
   //check playerState of whichPlayer
   //get input from whichPlayer depending on state
@@ -168,7 +170,7 @@ let rec runGame (players:Player list) =
     let availableBoard = getAvailableBoard (players.[0].Positions @ players.[1].Positions); //the avaialble positions
     let pos= getPlayerMove players.[0]//the positon the player wants to move to
     let updatedPlayer=
-        match makeMove pos players.[0] availableBoard currentBoard with
+        match makeMove pos players.[0] availableBoard with
         | true -> 
                    addPiece players.[0] ({(getCoords pos) with Status = Some (players.[0].Symbol) }) 
                    |> decrementPieces  //move was valid
