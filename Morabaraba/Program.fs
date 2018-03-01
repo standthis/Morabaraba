@@ -1,16 +1,18 @@
 ﻿// Learn more about F# at http://fsharp.org
 open System
- type Coords={
-       Pos: char * int
-       Layer: int
-       Status: Option<char>
-       PossibleMoves: (char * int) list
+
+
+ type Coords={                                          //used to store all information needed about each coordinate (or board space) on the board
+       Pos: char * int                                  //the actual coordinates of the board space eg. (A,1)
+       Layer: int                                       //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
+       Status: Option<char>                             //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
+       PossibleMoves: (char * int) list                 //all posible board spaces a tile can be moved to when moving from this coordinate
     }
 
-type PlayerState =
-| FLYING //number of pieces has decreased to 3
-| MOVING  //all pieces have been placed
-| PLACING
+type PlayerState =                                      //the phase of the game the player is in
+| FLYING                                                //NOTE: this phase is for when number of pieces on the board has decreased to 3
+| MOVING                                                //NOTE: this phase is for once all pieces have been placed
+| PLACING                                               //initial phase for placing tiles only
 
 type Player =
   {
@@ -20,13 +22,18 @@ type Player =
     PlayerState: PlayerState
     Positions: Coords List
   }
+
 let Player_1 = { Name="Player 1";Symbol='1';NumberOfPieces= 12; PlayerState = PLACING;Positions = [] }
 let Player_2 =  { Name="Player 2";Symbol='X'; NumberOfPieces= 12; PlayerState = PLACING; Positions = []}
+
 let Players=[Player_1;Player_2];
+
 //  let removePiece (player:Player) (piece:Coord)= //remove play
 let decrementPieces (player:Player) = {player with NumberOfPieces=(player.NumberOfPieces - 1)}
 let changePlayerState (player:Player) newState= { player with PlayerState = newState }
 let addPiece (player:Player) (piece:Coords) = {player with Positions= player.Positions@[piece] }
+
+
  (*let movePieces (player:Player) (from:char*int) (to_:Coords)= 
     let rec checkList (xs:Coords list) out :(Coords List) =
         match xs with
@@ -44,35 +51,43 @@ type MilStatus =
     | Broken
     | Formed
     | Free
+
 type Mil =
     {
         Coords: Coords list;
         MilStatus: MilStatus
     }
+
 let A1 = {Pos=('A',1);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let A4 = {Pos=('A',4);Layer=3;Status=None;PossibleMoves=[('A',1);('A',7);('B',4)] }  //done up to here
-let A7 = {Pos=('A',7);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let B2 = {Pos=('B',2);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let B4 = {Pos=('B',4);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let B6 = {Pos=('B',6);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let C3 = {Pos=('C',3);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let C4 = {Pos=('C',4);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let C5 = {Pos=('C',5);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let D1 = {Pos=('D',1);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let D2 = {Pos=('D',2);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let D3 = {Pos=('D',3);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let D5 = {Pos=('D',5);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let D6 = {Pos=('D',6);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let D7 = {Pos=('D',7);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let E3 = {Pos=('E',3);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let E4 = {Pos=('E',4);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let E5 = {Pos=('E',5);Layer=1;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let F2 = {Pos=('F',2);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let F4 = {Pos=('F',4);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let F6 = {Pos=('F',6);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let G1 = {Pos=('G',1);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] };
-let G4 = {Pos=('G',4);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }; 
-let G7 = {Pos=('G',7);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }; 
+let A4 = {Pos=('A',4);Layer=3;Status=None;PossibleMoves=[('A',1);('A',7);('B',4)] } 
+let A7 = {Pos=('A',7);Layer=3;Status=None;PossibleMoves=[('A',4);('B',6);('D',7)] }
+
+let B2 = {Pos=('B',2);Layer=2;Status=None;PossibleMoves=[('A',1);('B',4);('C',3);('D',2)] }
+let B4 = {Pos=('B',4);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('B',6);('C',4)] }
+let B6 = {Pos=('B',6);Layer=2;Status=None;PossibleMoves=[('A',7);('B',4);('D',6);('C',5)] }
+
+let C3 = {Pos=('C',3);Layer=1;Status=None;PossibleMoves=[('B',2);('C',4);('D',3)] }
+let C4 = {Pos=('C',4);Layer=1;Status=None;PossibleMoves=[('B',4);('C',3);('C',5)] }
+let C5 = {Pos=('C',5);Layer=1;Status=None;PossibleMoves=[('B',6);('C',4);('D',5)] }
+
+let D1 = {Pos=('D',1);Layer=3;Status=None;PossibleMoves=[('A',1);('D',2);('G',1)] }
+let D2 = {Pos=('D',2);Layer=2;Status=None;PossibleMoves=[('B',2);('D',1);('D',3);('F',2)] }
+let D3 = {Pos=('D',3);Layer=1;Status=None;PossibleMoves=[('C',3);('D',2);('E',3)] }
+let D5 = {Pos=('D',5);Layer=1;Status=None;PossibleMoves=[('C',5);('D',6);('E',5)] }
+let D6 = {Pos=('D',6);Layer=2;Status=None;PossibleMoves=[('B',6);('D',5);('D',7);('F',6)] }
+let D7 = {Pos=('D',7);Layer=3;Status=None;PossibleMoves=[('A',7);('D',6);('G',7)] }
+
+let E3 = {Pos=('E',3);Layer=1;Status=None;PossibleMoves=[('D',3);('F',2);('E',4)] }
+let E4 = {Pos=('E',4);Layer=1;Status=None;PossibleMoves=[('E',3);('F',4);('E',5)] }
+let E5 = {Pos=('E',5);Layer=1;Status=None;PossibleMoves=[('D',5);('E',4);('F',6)] }
+
+let F2 = {Pos=('F',2);Layer=2;Status=None;PossibleMoves=[('D',2);('E',3);('F',4);('G',1)] }
+let F4 = {Pos=('F',4);Layer=2;Status=None;PossibleMoves=[('E',4);('F',2);('F',6);('G',4)] }
+let F6 = {Pos=('F',6);Layer=2;Status=None;PossibleMoves=[('D',6);('E',5);('F',4);('G',7)] }
+
+let G1 = {Pos=('G',1);Layer=3;Status=None;PossibleMoves=[('D',1);('F',2);('G',4)] }
+let G4 = {Pos=('G',4);Layer=3;Status=None;PossibleMoves=[('F',4);('G',1);('G',7)] }
+let G7 = {Pos=('G',7);Layer=3;Status=None;PossibleMoves=[('D',7);('F',6);('G',4)] }
 
 
 let startBoard=[A1;A4;A7;B2;B4;B6;C3;C4;C5;D1;D2;D3;D5;D6;D7;E3;E4;E5;F2;F4;F6;G1;G4;G7]
@@ -192,8 +207,17 @@ let startGame () =
 [<EntryPoint>]
 let main argv =
     printfn "Hello World from F#!"
- 
-    startGame ()
+    let A = sprintf  """(%c)-------------(%c)------------(%c)
+| \              |             / |
+|  \             |            /  |
+|  (%c)----------(%c)---------(%c)  |
+|     \          |            /    |
+       \         |           /
+        (%c)-----(%c)----(%c)     |   
+---------------------------------""" ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' '
+    printf "%s" A
+    
+    //startGame ()
     0 // return an integer exit code
 
 
