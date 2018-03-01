@@ -207,5 +207,21 @@ let startGame () =
 [<EntryPoint>]
 let main argv =
     printfn "Hello World from F#!"
-    startGame ()
+    let A = sprintf  """(%c)-------------(%c)------------(%c)
+| \              |             / |
+|  \             |            /  |
+|  (%c)----------(%c)---------(%c)  |
+|     \          |            /    |
+       \         |           /
+        (%c)-----(%c)----(%c)     |   
+---------------------------------""" ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' '
+    printf "%s" A
+    
+    //startGame ()
     0 // return an integer exit code
+
+
+
+
+               
+         
