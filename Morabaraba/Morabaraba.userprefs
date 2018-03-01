@@ -1,7 +1,7 @@
-﻿<Properties StartupConfiguration="{A265F3E6-37DF-43BA-AB2F-83B164262A9E}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Morabaraba/Program.fs">
+﻿<Properties StartupConfiguration="{FEC4ADCE-C4EB-4904-8309-59B5943CEC23}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Program.fs">
     <Files>
-      <File FileName="Morabaraba/Program.fs" Line="14" Column="1" />
+      <File FileName="Program.fs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
