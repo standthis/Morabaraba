@@ -1,7 +1,7 @@
 ﻿<Properties StartupConfiguration="{A265F3E6-37DF-43BA-AB2F-83B164262A9E}|Default">
   <MonoDevelop.Ide.Workbench ActiveDocument="Morabaraba/Program.fs">
     <Files>
-      <File FileName="Morabaraba/Program.fs" Line="1" Column="1" />
+      <File FileName="Morabaraba/Program.fs" Line="8" Column="19" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
@@ -9,5 +9,6 @@
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Morabaraba PreferredExecutionTarget="MonoDevelop.Default" />
   <MultiItemStartupConfigurations />
 </Properties>
