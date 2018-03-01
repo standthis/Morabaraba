@@ -2,10 +2,10 @@
 open System
 
 
- type Coords={                                          //used to store all information needed about each coordinate (or board space) on the board
+ type Coords = {                                        //used to store all information needed about each coordinate (or board space) on the board
        Pos: char * int                                  //the actual coordinates of the board space eg. (A,1)
        Layer: int                                       //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
-       Status: Option<char>                             //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
+       Symbol: char                                     //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
        PossibleMoves: (char * int) list                 //all posible board spaces a tile can be moved to when moving from this coordinate
     }
 
@@ -14,8 +14,7 @@ type PlayerState =                                      //the phase of the game 
 | MOVING                                                //NOTE: this phase is for once all pieces have been placed
 | PLACING                                               //initial phase for placing tiles only
 
-type Player =
-  {
+type Player =  {                                        //used to store player information and where their cows are positioned
     Name: string
     Symbol: char
     NumberOfPieces : int
@@ -23,15 +22,15 @@ type Player =
     Positions: Coords List
   }
 
-let Player_1 = { Name="Player 1";Symbol='1';NumberOfPieces= 12; PlayerState = PLACING;Positions = [] }
-let Player_2 =  { Name="Player 2";Symbol='X'; NumberOfPieces= 12; PlayerState = PLACING; Positions = []}
+let Player_1 = { Name = "Player 1"; Symbol = 'x'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }
+let Player_2 = { Name = "Player 2"; Symbol = 'o'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }
 
-let Players=[Player_1;Player_2];
+let Players = [Player_1;Player_2]
 
 //  let removePiece (player:Player) (piece:Coord)= //remove play
-let decrementPieces (player:Player) = {player with NumberOfPieces=(player.NumberOfPieces - 1)}
-let changePlayerState (player:Player) newState= { player with PlayerState = newState }
-let addPiece (player:Player) (piece:Coords) = {player with Positions= player.Positions@[piece] }
+let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }
+let changePlayerState (player:Player) newState = { player with PlayerState = newState }
+let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }
 
 
  (*let movePieces (player:Player) (from:char*int) (to_:Coords)= 
@@ -58,76 +57,82 @@ type Mil =
         MilStatus: MilStatus
     }
 
-let A1 = {Pos=('A',1);Layer=3;Status=None;PossibleMoves=[('A',4);('B',2);('D',1)] }
-let A4 = {Pos=('A',4);Layer=3;Status=None;PossibleMoves=[('A',1);('A',7);('B',4)] } 
-let A7 = {Pos=('A',7);Layer=3;Status=None;PossibleMoves=[('A',4);('B',6);('D',7)] }
+let A1 = {Pos=('A',1);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }
+let A4 = {Pos=('A',4);Layer=3;Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
+let A7 = {Pos=('A',7);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
 
-let B2 = {Pos=('B',2);Layer=2;Status=None;PossibleMoves=[('A',1);('B',4);('C',3);('D',2)] }
-let B4 = {Pos=('B',4);Layer=2;Status=None;PossibleMoves=[('A',4);('B',2);('B',6);('C',4)] }
-let B6 = {Pos=('B',6);Layer=2;Status=None;PossibleMoves=[('A',7);('B',4);('D',6);('C',5)] }
+let B2 = {Pos=('B',2);Layer=2;Symbol=' ';PossibleMoves=[('A',1);('B',4);('C',3);('D',2)] }
+let B4 = {Pos=('B',4);Layer=2;Symbol=' ';PossibleMoves=[('A',4);('B',2);('B',6);('C',4)] }
+let B6 = {Pos=('B',6);Layer=2;Symbol=' ';PossibleMoves=[('A',7);('B',4);('D',6);('C',5)] }
 
-let C3 = {Pos=('C',3);Layer=1;Status=None;PossibleMoves=[('B',2);('C',4);('D',3)] }
-let C4 = {Pos=('C',4);Layer=1;Status=None;PossibleMoves=[('B',4);('C',3);('C',5)] }
-let C5 = {Pos=('C',5);Layer=1;Status=None;PossibleMoves=[('B',6);('C',4);('D',5)] }
+let C3 = {Pos=('C',3);Layer=1;Symbol=' ';PossibleMoves=[('B',2);('C',4);('D',3)] }
+let C4 = {Pos=('C',4);Layer=1;Symbol=' ';PossibleMoves=[('B',4);('C',3);('C',5)] }
+let C5 = {Pos=('C',5);Layer=1;Symbol=' ';PossibleMoves=[('B',6);('C',4);('D',5)] }
 
-let D1 = {Pos=('D',1);Layer=3;Status=None;PossibleMoves=[('A',1);('D',2);('G',1)] }
-let D2 = {Pos=('D',2);Layer=2;Status=None;PossibleMoves=[('B',2);('D',1);('D',3);('F',2)] }
-let D3 = {Pos=('D',3);Layer=1;Status=None;PossibleMoves=[('C',3);('D',2);('E',3)] }
-let D5 = {Pos=('D',5);Layer=1;Status=None;PossibleMoves=[('C',5);('D',6);('E',5)] }
-let D6 = {Pos=('D',6);Layer=2;Status=None;PossibleMoves=[('B',6);('D',5);('D',7);('F',6)] }
-let D7 = {Pos=('D',7);Layer=3;Status=None;PossibleMoves=[('A',7);('D',6);('G',7)] }
+let D1 = {Pos=('D',1);Layer=3;Symbol=' ';PossibleMoves=[('A',1);('D',2);('G',1)] }
+let D2 = {Pos=('D',2);Layer=2;Symbol=' ';PossibleMoves=[('B',2);('D',1);('D',3);('F',2)] }
+let D3 = {Pos=('D',3);Layer=1;Symbol=' ';PossibleMoves=[('C',3);('D',2);('E',3)] }
 
-let E3 = {Pos=('E',3);Layer=1;Status=None;PossibleMoves=[('D',3);('F',2);('E',4)] }
-let E4 = {Pos=('E',4);Layer=1;Status=None;PossibleMoves=[('E',3);('F',4);('E',5)] }
-let E5 = {Pos=('E',5);Layer=1;Status=None;PossibleMoves=[('D',5);('E',4);('F',6)] }
+let D5 = {Pos=('D',5);Layer=1;Symbol=' ';PossibleMoves=[('C',5);('D',6);('E',5)] }
+let D6 = {Pos=('D',6);Layer=2;Symbol=' ';PossibleMoves=[('B',6);('D',5);('D',7);('F',6)] }
+let D7 = {Pos=('D',7);Layer=3;Symbol=' ';PossibleMoves=[('A',7);('D',6);('G',7)] }
 
-let F2 = {Pos=('F',2);Layer=2;Status=None;PossibleMoves=[('D',2);('E',3);('F',4);('G',1)] }
-let F4 = {Pos=('F',4);Layer=2;Status=None;PossibleMoves=[('E',4);('F',2);('F',6);('G',4)] }
-let F6 = {Pos=('F',6);Layer=2;Status=None;PossibleMoves=[('D',6);('E',5);('F',4);('G',7)] }
+let E3 = {Pos=('E',3);Layer=1;Symbol=' ';PossibleMoves=[('D',3);('F',2);('E',4)] }
+let E4 = {Pos=('E',4);Layer=1;Symbol=' ';PossibleMoves=[('E',3);('F',4);('E',5)] }
+let E5 = {Pos=('E',5);Layer=1;Symbol=' ';PossibleMoves=[('D',5);('E',4);('F',6)] }
 
-let G1 = {Pos=('G',1);Layer=3;Status=None;PossibleMoves=[('D',1);('F',2);('G',4)] }
-let G4 = {Pos=('G',4);Layer=3;Status=None;PossibleMoves=[('F',4);('G',1);('G',7)] }
-let G7 = {Pos=('G',7);Layer=3;Status=None;PossibleMoves=[('D',7);('F',6);('G',4)] }
+let F2 = {Pos=('F',2);Layer=2;Symbol=' ';PossibleMoves=[('D',2);('E',3);('F',4);('G',1)] }
+let F4 = {Pos=('F',4);Layer=2;Symbol=' ';PossibleMoves=[('E',4);('F',2);('F',6);('G',4)] }
+let F6 = {Pos=('F',6);Layer=2;Symbol=' ';PossibleMoves=[('D',6);('E',5);('F',4);('G',7)] }
+
+let G1 = {Pos=('G',1);Layer=3;Symbol=' ';PossibleMoves=[('D',1);('F',2);('G',4)] }
+let G4 = {Pos=('G',4);Layer=3;Symbol=' ';PossibleMoves=[('F',4);('G',1);('G',7)] }
+let G7 = {Pos=('G',7);Layer=3;Symbol=' ';PossibleMoves=[('D',7);('F',6);('G',4)] }
 
 
 let startBoard=[A1;A4;A7;B2;B4;B6;C3;C4;C5;D1;D2;D3;D5;D6;D7;E3;E4;E5;F2;F4;F6;G1;G4;G7]
 //let mills = [{Coords=[A1;B2;C3] M};[];[];[]] //make this a list of all the possible mills that can be formed
 //player will check if there positions contains this mills[0] or mills[1]..
-let printBoard b = //print a board b
-    let scaler=4; //how big you want the board to be
-    let indentScaler=3; // how indented you want board to be
-    let numbers=["1";"2";"3";" 4";" 5";"6";"7"];
-    let s= (String.concat (sprintf "%*s" (scaler - 1) "") numbers);
-    printfn "%*s%s" ((3*indentScaler - 3)*scaler+1) "" s
-    let getChar (x:Option<char>) =
-        match x with 
-        | None -> 'O'
-        | Some a -> a
-    let printRow (a:Option<char>) (b:Option<char>) (c:Option<char>) layer rowName =
-            let initialSpace= ((3-layer)*scaler + 1)
-            let spacing =
-                match rowName with //spacing depends on row and layer
-                  |'D' -> (scaler-1) //minus 1 cause of initial 'O' in first row of D
-                  | _ -> (layer*scaler)
-            printf "%*c %*c %*c " initialSpace (getChar a) spacing (getChar b) spacing (getChar c)
-    let rec print (list:Coords list) = 
-        match list with
-        | [] -> ()
-        | a::b::c::rest ->
-            match a.Pos with
-            | (row,col) -> 
-                match (row,col) with 
-                | ('D',1) -> printf "%*c " ((3*indentScaler - 3)*scaler) row
-                             printRow a.Status b.Status c.Status a.Layer row//special case
-                            // printf "%*s " (scaler-2) "" //print the extra spacing
-                | ('D',5) -> printRow a.Status b.Status c.Status a.Layer row
-                             printfn ""
-                | _->   printf "%*c " ((3*indentScaler - 3)*scaler)  row //print the row
-                        printRow a.Status b.Status c.Status a.Layer row
-                        printfn ""
-            print rest 
-         | _ -> ()  
-    print b
+
+let printBoard (board:Coords list) (players:Player list) = //print a board b
+    let ps1, ps2, posOfplayer1 =
+        match players.[0].Name with
+        | "Player 1" -> '*',' ',0
+        | _ -> ' ','*',1
+    
+
+    let A = sprintf  """
+      1   2   3       4      5   6   7
+ 
+  A  (%c)-------------(%c)------------(%c)
+      |\              |             /|
+      | \             |            / |
+      |  \            |           /  |
+  B   |  (%c)---------(%c)--------(%c)  |
+      |   |\          |         /|   |
+      |   | \         |        / |   |
+      |   |  \        |       /  |   |
+  C   |   |  (%c)-----(%c)----(%c)  |   |          %cPlayer 1               %cPlayer 2
+      |   |   |              |   |   |          ----------              ----------
+      |   |   |              |   |   |          Unplaced Cows : %d       Unplaced Cows : %d
+  D  (%c)-(%c)-(%c)            (%c)-(%c)-(%c)         Cows alive :            Cows alive : 
+      |   |   |              |   |   |          Cows killed :           Cows killed : 
+      |   |   |              |   |   |
+  E   |   |  (%c)-----(%c)----(%c)  |   |  
+      |   |  /        |       \  |   |
+      |   | /         |        \ |   |
+      |   |/          |         \|   |
+  F   |  (%c)---------(%c)--------(%c)  |
+      |  /            |           \  |
+      | /             |            \ |
+      |/              |             \|
+  G  (%c)-------------(%c)------------(%c)
+   """ 
+                board.[0].Symbol board.[1].Symbol board.[2].Symbol board.[3].Symbol board.[4].Symbol board.[5].Symbol board.[6].Symbol board.[7].Symbol
+                board.[8].Symbol ps1 ps2 players.[posOfplayer1].NumberOfPieces players.[(posOfplayer1+1)%2].NumberOfPieces board.[9].Symbol board.[10].Symbol board.[11].Symbol board.[12].Symbol board.[13].Symbol board.[14].Symbol board.[15].Symbol
+                board.[16].Symbol board.[17].Symbol board.[18].Symbol board.[19].Symbol board.[20].Symbol board.[21].Symbol board.[22].Symbol board.[23].Symbol
+    printf "%s" A
+
 let getAvailableBoard (playerPositions:(Coords list)) = //returns are board with only available positions
 //based on  what the where the players have played
     let rec filterOut (xs:Coords list) out = 
@@ -143,7 +148,7 @@ let getCurrentBoard (playerPositions:(Coords list))  =
         | []->out
         | a::rest-> changeBoard rest (List.map (fun x -> 
             match x.Pos=a.Pos with
-            | true -> {x with Status = a.Status}
+            | true -> {x with Symbol = a.Symbol}
             | _ -> x) out ) 
              
     changeBoard playerPositions startBoard  //filterOut
@@ -157,7 +162,7 @@ let getPlayerMove (player:Player) : (char*int) =
     | PLACING -> 
         printfn "%s's turn(%d pieces left)" player.Name player.NumberOfPieces
         printf "Row:" 
-        let row= Console.ReadLine().[0];
+        let row= Char.ToUpper(Console.ReadLine().[0])
         printf "Column: " 
         let col = int (Console.ReadLine())
         (row,col)
@@ -166,7 +171,7 @@ let getPlayerMove (player:Player) : (char*int) =
    // | _ -> failwith "Game is bugged!"
    
 let makeMove (coord:char*int) (player:Player) availableBoard = //try make a move using the avaible board
-    let length=(List.filter (fun x -> x.Pos=coord) availableBoard).Length;
+    let length = (List.filter (fun x -> x.Pos=coord) availableBoard).Length;
     //if the length is not 0 this means a position that you tried to move to was taken
     length<>0
     
@@ -179,27 +184,29 @@ let makeMove (coord:char*int) (player:Player) availableBoard = //try make a move
   //if move was valid move piece to desired location
   //change player to contain new list of positions placed
   //change numberofPieces and change state if neccessary
+
 let rec runGame (players:Player list) =
     let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
-    printBoard currentBoard //print the board
+    printBoard currentBoard players //print the board
     let availableBoard = getAvailableBoard (players.[0].Positions @ players.[1].Positions); //the avaialble positions
     let pos= getPlayerMove players.[0]//the positon the player wants to move to
     let updatedPlayer=
         match makeMove pos players.[0] availableBoard with
         | true -> 
-                   addPiece players.[0] ({(getCoords pos) with Status = Some (players.[0].Symbol) }) 
+                   addPiece players.[0] ({(getCoords pos) with Symbol = players.[0].Symbol }) 
                    |> decrementPieces  //move was valid
                    //use piping when using more functions on the player
                   
         | _ ->
             printfn "Pos is %A is not a valid position" pos
             runGame players //make the move again (will make more efficient later)
+    
     runGame [players.[1];updatedPlayer]
 
 
 
 let startGame () = 
-    runGame Players//start the game
+    runGame Players //start the game
 
      
           
@@ -207,16 +214,8 @@ let startGame () =
 [<EntryPoint>]
 let main argv =
     printfn "Hello World from F#!"
-    let A = sprintf  """(%c)-------------(%c)------------(%c)
-| \              |             / |
-|  \             |            /  |
-|  (%c)----------(%c)---------(%c)  |
-|    \           |            /    |
-      \          |           /
-      (%c)-----(%c)----(%c)     |   
----------------------------------""" ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' ' '
-    printf "%s" A
-    Console.ReadKey()
+    startGame ()
+     //Console.ReadKey()
    
     //startGame ()
     0 // return an integer exit code
