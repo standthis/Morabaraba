@@ -33,24 +33,18 @@ let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 12; 
 let Players = [Player_1;Player_2]                                                                                                   //list of the two players (used to alternate between the two players depending on whose turn it is)
 
 //  let removePiece (player:Player) (piece:Coord)= //remove play
+let makeMove (coord:char*int) availableBoard = //try make a move using the available board
+    (List.filter (fun x -> x.Pos=coord) availableBoard).Length <> 0; //if the length is not 0 this means a position that you tried to move to was taken
+   
 let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }                                   //decreases the number of unplayed pieces a given player has by 1
 let changePlayerState (player:Player) newState = { player with PlayerState = newState }                                             //sets the given player's state to the given state
 let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                   //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
+let movePiece (player:Player) (from:char*int) (to_:char*int)=  //assumes coords passed are valid
+    { player with Positions = List.map (fun x -> match x.Pos=from with 
+                                                  | true -> { x with Pos = to_} 
+                                                  | _ -> x ) player.Positions  } //return the player with new positions
 
-
- (*let movePieces (player:Player) (from:char*int) (to_:Coords)= 
-    let rec checkList (xs:Coords list) out :(Coords List) =
-        match xs with
-        | [] ->out
-        | a::rest ->
-            match a.Pos with
-            | from -> rest@[to_]; //remove what 'a' was and replace it with to_ (the new position)
-            | _ -> checkList (rest@[a]) rest; //doesn't
-    match from with 
-    | 
-    | *)
-
-
+  
 let A1 = {Pos=('A',1);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  //
 let A4 = {Pos=('A',4);Layer=3;Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
 let A7 = {Pos=('A',7);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
@@ -93,9 +87,9 @@ let printBoard (board:Coords list) (players:Player list) = //print a board b
         match players.[0].ID with
         | 1 -> '*',' ',0
         | _ -> ' ','*',1
-    
+     
 
-    let A = sprintf  """
+    let boardString = sprintf  """
       1   2   3       4      5   6   7
  
   A  (%c)-------------(%c)------------(%c)
@@ -122,19 +116,18 @@ let printBoard (board:Coords list) (players:Player list) = //print a board b
       |/              |             \|
   G  (%c)-------------(%c)------------(%c)
    """ 
-                board.[0].Symbol board.[1].Symbol board.[2].Symbol board.[3].Symbol board.[4].Symbol board.[5].Symbol board.[6].Symbol board.[7].Symbol
-                board.[8].Symbol ps1 ps2 players.[posOfplayer1].NumberOfPieces players.[(posOfplayer1+1)%2].NumberOfPieces board.[9].Symbol board.[10].Symbol 
-                board.[11].Symbol board.[12].Symbol board.[13].Symbol board.[14].Symbol board.[15].Symbol board.[16].Symbol board.[17].Symbol board.[18].Symbol
-                board.[19].Symbol board.[20].Symbol board.[21].Symbol board.[22].Symbol board.[23].Symbol
-    printf "%s" A
+                        board.[0].Symbol board.[1].Symbol board.[2].Symbol board.[3].Symbol board.[4].Symbol board.[5].Symbol board.[6].Symbol board.[7].Symbol
+                        board.[8].Symbol ps1 ps2 players.[posOfplayer1].NumberOfPieces players.[(posOfplayer1+1)%2].NumberOfPieces board.[9].Symbol board.[10].Symbol 
+                        board.[11].Symbol board.[12].Symbol board.[13].Symbol board.[14].Symbol board.[15].Symbol board.[16].Symbol board.[17].Symbol board.[18].Symbol
+                        board.[19].Symbol board.[20].Symbol board.[21].Symbol board.[22].Symbol board.[23].Symbol
+    printf "%s" boardString
 
-let getAvailableBoard (playerPositions:(Coords list)) = //returns are board with only available positions
-//based on  what the where the players have played
+let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) = //returns coords in boardToFilterOut that aren't in filterBoard
     let rec filterOut (xs:Coords list) out = 
         match xs with
         | []->out
         | a::rest-> filterOut rest (List.filter (fun x -> x.Pos<>a.Pos ) out )
-    filterOut playerPositions startBoard  //filterOut
+    filterOut filterBoard boardToFilterOut  //filterOut
 
 
 let getCurrentBoard (playerPositions:(Coords list))  =
@@ -164,12 +157,7 @@ let getPlayerMove (player:Player) : (char*int) =
     | MOVING -> ('A',0) //placeholder
     | FLYING -> ('A',0) //placeholder
    // | _ -> failwith "Game is bugged!"
-   
-let makeMove (coord:char*int) (player:Player) availableBoard = //try make a move using the avaible board
-    let length = (List.filter (fun x -> x.Pos=coord) availableBoard).Length;
-    //if the length is not 0 this means a position that you tried to move to was taken
-    length<>0
-    
+
 
   //getAvailableBoard 
   //get the avaibleBoard given both player lists of positions
@@ -180,13 +168,14 @@ let makeMove (coord:char*int) (player:Player) availableBoard = //try make a move
   //change player to contain new list of positions placed
   //change numberofPieces and change state if neccessary
 
-let rec runGame (players:Player list) =
+let rec runGame (players:Player list) = //pass message saying where player moved or that 
+    //if error don't do next 3 lines error means move was not valid
     let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
+    let availableBoard = filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard //the avaialble positions
     printBoard currentBoard players //print the board
-    let availableBoard = getAvailableBoard (players.[0].Positions @ players.[1].Positions); //the avaialble positions
     let pos= getPlayerMove players.[0]//the positon the player wants to move to
     let updatedPlayer=
-        match makeMove pos players.[0] availableBoard with
+        match makeMove pos availableBoard with //try to make a move to the available board
         | true -> 
                    addPiece players.[0] ({(getCoords pos) with Symbol = players.[0].Symbol }) 
                    |> decrementPieces  //move was valid
