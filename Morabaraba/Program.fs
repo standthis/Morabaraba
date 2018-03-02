@@ -3,34 +3,39 @@ open System
 
 
  type Coords = {                                        //used to store all information needed about each coordinate (or board space) on the board
-       Pos: char * int                                  //the actual coordinates of the board space eg. (A,1)
-       Layer: int                                       //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
-       Symbol: char                                     //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
-       PossibleMoves: (char * int) list                 //all posible board spaces a tile can be moved to when moving from this coordinate
-    }
+    Pos: char * int                                     //the actual coordinates of the board space eg. (A,1)
+    Layer: int                                          //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
+    Symbol: char                                        //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
+    PossibleMoves: (char * int) list                    //all posible board spaces a tile can be moved to when moving from this coordinate
+  }
 
 type PlayerState =                                      //the phase of the game the player is in
 | FLYING                                                //NOTE: this phase is for when number of pieces on the board has decreased to 3
 | MOVING                                                //NOTE: this phase is for once all pieces have been placed
 | PLACING                                               //initial phase for placing tiles only
 
-type Player =  {                                        //used to store player information and where their cows are positioned
-    Name: string
-    Symbol: char
-    NumberOfPieces : int
-    PlayerState: PlayerState
-    Positions: Coords List
+type Player =  {                                        //used to store player stats and their current game state (the phase they're in, the positions of their cows etc)
+    Name: string                                        //The name of the player (as they've entered)
+    ID: int                                             //The ID of the player (used to distinguish between the two)
+    Symbol: char                                        //The symbol used to represent this player's cows on the board
+    NumberOfPieces : int                                //The number of unplayed pieces they have left off the board
+    PlayerState: PlayerState                            //Which phase of the game the player is in
+    Positions: Coords List                              //The list of all coordinates the player has a cow placed
   }
 
-let Player_1 = { Name = "Player 1"; Symbol = 'x'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }
-let Player_2 = { Name = "Player 2"; Symbol = 'o'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }
+type Mil = {                                            //used for creating all possible mills that can be formed (a mill is 3 coordinates in a straight line)
+    Coords: Coords list;                                //list to store the 3 coordinates that create a mill
+  }
 
-let Players = [Player_1;Player_2]
+let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
+let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
+
+let Players = [Player_1;Player_2]                                                                                                   //list of the two players (used to alternate between the two players depending on whose turn it is)
 
 //  let removePiece (player:Player) (piece:Coord)= //remove play
-let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }
-let changePlayerState (player:Player) newState = { player with PlayerState = newState }
-let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }
+let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }                                   //decreases the number of unplayed pieces a given player has by 1
+let changePlayerState (player:Player) newState = { player with PlayerState = newState }                                             //sets the given player's state to the given state
+let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                   //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
 
 
  (*let movePieces (player:Player) (from:char*int) (to_:Coords)= 
@@ -46,18 +51,7 @@ let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Po
     | *)
 
 
-type MilStatus =
-    | Broken
-    | Formed
-    | Free
-
-type Mil =
-    {
-        Coords: Coords list;
-        MilStatus: MilStatus
-    }
-
-let A1 = {Pos=('A',1);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }
+let A1 = {Pos=('A',1);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  //
 let A4 = {Pos=('A',4);Layer=3;Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
 let A7 = {Pos=('A',7);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
 
@@ -96,8 +90,8 @@ let startBoard=[A1;A4;A7;B2;B4;B6;C3;C4;C5;D1;D2;D3;D5;D6;D7;E3;E4;E5;F2;F4;F6;G
 
 let printBoard (board:Coords list) (players:Player list) = //print a board b
     let ps1, ps2, posOfplayer1 =
-        match players.[0].Name with
-        | "Player 1" -> '*',' ',0
+        match players.[0].ID with
+        | 1 -> '*',' ',0
         | _ -> ' ','*',1
     
 
@@ -129,8 +123,9 @@ let printBoard (board:Coords list) (players:Player list) = //print a board b
   G  (%c)-------------(%c)------------(%c)
    """ 
                 board.[0].Symbol board.[1].Symbol board.[2].Symbol board.[3].Symbol board.[4].Symbol board.[5].Symbol board.[6].Symbol board.[7].Symbol
-                board.[8].Symbol ps1 ps2 players.[posOfplayer1].NumberOfPieces players.[(posOfplayer1+1)%2].NumberOfPieces board.[9].Symbol board.[10].Symbol board.[11].Symbol board.[12].Symbol board.[13].Symbol board.[14].Symbol board.[15].Symbol
-                board.[16].Symbol board.[17].Symbol board.[18].Symbol board.[19].Symbol board.[20].Symbol board.[21].Symbol board.[22].Symbol board.[23].Symbol
+                board.[8].Symbol ps1 ps2 players.[posOfplayer1].NumberOfPieces players.[(posOfplayer1+1)%2].NumberOfPieces board.[9].Symbol board.[10].Symbol 
+                board.[11].Symbol board.[12].Symbol board.[13].Symbol board.[14].Symbol board.[15].Symbol board.[16].Symbol board.[17].Symbol board.[18].Symbol
+                board.[19].Symbol board.[20].Symbol board.[21].Symbol board.[22].Symbol board.[23].Symbol
     printf "%s" A
 
 let getAvailableBoard (playerPositions:(Coords list)) = //returns are board with only available positions
