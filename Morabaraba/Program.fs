@@ -5,8 +5,7 @@ open System.Security.Cryptography
 
 
  type Coords = {                                        //used to store all information needed about each coordinate (or board space) on the board
-    Pos: char * int                                     //the actual coordinates of the board space eg. (A,1)
-    Layer: int                                          //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
+    Pos: char * int                                     //the actual coordinates of the board space eg. (A,1)                                      //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
     Symbol: char                                        //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
     PossibleMoves: (char * int) list                    //all posible board spaces a tile can be moved to when moving from this coordinate
   }
@@ -50,44 +49,44 @@ let checkStateChange (player:Player) =
         | true -> changePlayerState player MOVING
         | _ -> player 
     | MOVING -> 
-        match player.Positions.Length <= 3 with 
+        match player.Positions.Length = 3 with 
         | true -> changePlayerState player FLYING
         | _ -> player
     | _ -> player  
         
 
   
-let A1 = {Pos=('A',1);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  //
-let A4 = {Pos=('A',4);Layer=3;Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
-let A7 = {Pos=('A',7);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
+let A1 = {Pos=('A',1);Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  //
+let A4 = {Pos=('A',4);Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
+let A7 = {Pos=('A',7);Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
 
-let B2 = {Pos=('B',2);Layer=2;Symbol=' ';PossibleMoves=[('A',1);('B',4);('C',3);('D',2)] }
-let B4 = {Pos=('B',4);Layer=2;Symbol=' ';PossibleMoves=[('A',4);('B',2);('B',6);('C',4)] }
-let B6 = {Pos=('B',6);Layer=2;Symbol=' ';PossibleMoves=[('A',7);('B',4);('D',6);('C',5)] }
+let B2 = {Pos=('B',2);Symbol=' ';PossibleMoves=[('A',1);('B',4);('C',3);('D',2)] }
+let B4 = {Pos=('B',4);Symbol=' ';PossibleMoves=[('A',4);('B',2);('B',6);('C',4)] }
+let B6 = {Pos=('B',6);Symbol=' ';PossibleMoves=[('A',7);('B',4);('D',6);('C',5)] }
 
-let C3 = {Pos=('C',3);Layer=1;Symbol=' ';PossibleMoves=[('B',2);('C',4);('D',3)] }
-let C4 = {Pos=('C',4);Layer=1;Symbol=' ';PossibleMoves=[('B',4);('C',3);('C',5)] }
-let C5 = {Pos=('C',5);Layer=1;Symbol=' ';PossibleMoves=[('B',6);('C',4);('D',5)] }
+let C3 = {Pos=('C',3);Symbol=' ';PossibleMoves=[('B',2);('C',4);('D',3)] }
+let C4 = {Pos=('C',4);Symbol=' ';PossibleMoves=[('B',4);('C',3);('C',5)] }
+let C5 = {Pos=('C',5);Symbol=' ';PossibleMoves=[('B',6);('C',4);('D',5)] }
 
-let D1 = {Pos=('D',1);Layer=3;Symbol=' ';PossibleMoves=[('A',1);('D',2);('G',1)] }
-let D2 = {Pos=('D',2);Layer=2;Symbol=' ';PossibleMoves=[('B',2);('D',1);('D',3);('F',2)] }
-let D3 = {Pos=('D',3);Layer=1;Symbol=' ';PossibleMoves=[('C',3);('D',2);('E',3)] }
+let D1 = {Pos=('D',1);Symbol=' ';PossibleMoves=[('A',1);('D',2);('G',1)] }
+let D2 = {Pos=('D',2);Symbol=' ';PossibleMoves=[('B',2);('D',1);('D',3);('F',2)] }
+let D3 = {Pos=('D',3);Symbol=' ';PossibleMoves=[('C',3);('D',2);('E',3)] }
 
-let D5 = {Pos=('D',5);Layer=1;Symbol=' ';PossibleMoves=[('C',5);('D',6);('E',5)] }
-let D6 = {Pos=('D',6);Layer=2;Symbol=' ';PossibleMoves=[('B',6);('D',5);('D',7);('F',6)] }
-let D7 = {Pos=('D',7);Layer=3;Symbol=' ';PossibleMoves=[('A',7);('D',6);('G',7)] }
+let D5 = {Pos=('D',5);Symbol=' ';PossibleMoves=[('C',5);('D',6);('E',5)] }
+let D6 = {Pos=('D',6);Symbol=' ';PossibleMoves=[('B',6);('D',5);('D',7);('F',6)] }
+let D7 = {Pos=('D',7);Symbol=' ';PossibleMoves=[('A',7);('D',6);('G',7)] }
 
-let E3 = {Pos=('E',3);Layer=1;Symbol=' ';PossibleMoves=[('D',3);('F',2);('E',4)] }
-let E4 = {Pos=('E',4);Layer=1;Symbol=' ';PossibleMoves=[('E',3);('F',4);('E',5)] }
-let E5 = {Pos=('E',5);Layer=1;Symbol=' ';PossibleMoves=[('D',5);('E',4);('F',6)] }
+let E3 = {Pos=('E',3);Symbol=' ';PossibleMoves=[('D',3);('F',2);('E',4)] }
+let E4 = {Pos=('E',4);Symbol=' ';PossibleMoves=[('E',3);('F',4);('E',5)] }
+let E5 = {Pos=('E',5);Symbol=' ';PossibleMoves=[('D',5);('E',4);('F',6)] }
 
-let F2 = {Pos=('F',2);Layer=2;Symbol=' ';PossibleMoves=[('D',2);('E',3);('F',4);('G',1)] }
-let F4 = {Pos=('F',4);Layer=2;Symbol=' ';PossibleMoves=[('E',4);('F',2);('F',6);('G',4)] }
-let F6 = {Pos=('F',6);Layer=2;Symbol=' ';PossibleMoves=[('D',6);('E',5);('F',4);('G',7)] }
+let F2 = {Pos=('F',2);Symbol=' ';PossibleMoves=[('D',2);('E',3);('F',4);('G',1)] }
+let F4 = {Pos=('F',4);Symbol=' ';PossibleMoves=[('E',4);('F',2);('F',6);('G',4)] }
+let F6 = {Pos=('F',6);Symbol=' ';PossibleMoves=[('D',6);('E',5);('F',4);('G',7)] }
 
-let G1 = {Pos=('G',1);Layer=3;Symbol=' ';PossibleMoves=[('D',1);('F',2);('G',4)] }
-let G4 = {Pos=('G',4);Layer=3;Symbol=' ';PossibleMoves=[('F',4);('G',1);('G',7)] }
-let G7 = {Pos=('G',7);Layer=3;Symbol=' ';PossibleMoves=[('D',7);('F',6);('G',4)] }
+let G1 = {Pos=('G',1);Symbol=' ';PossibleMoves=[('D',1);('F',2);('G',4)] }
+let G4 = {Pos=('G',4);Symbol=' ';PossibleMoves=[('F',4);('G',1);('G',7)] }
+let G7 = {Pos=('G',7);Symbol=' ';PossibleMoves=[('D',7);('F',6);('G',4)] }
 
 let startBoard = [ A1; A4; A7; B2; B4; B6; C3; C4; C5; D1; D2; D3; D5; D6; D7; E3; E4; E5; F2; F4; F6; G1; G4; G7 ]
 
@@ -209,6 +208,8 @@ let movePiece (player:Player) (from:char*int) (to_:char*int)=  //assumes coords 
     { player with Positions = List.map (fun x -> match x.Pos=from with 
                                                   | true -> { x with Pos = to_} 
                                                   | _ -> x ) player.Positions  } //return the player with new positions
+
+
 
 let getPlayerMills (player:Player) = 
     List.filter (fun mill-> (filterOutBoard player.Positions mill).Length=0) allBoardMills
