@@ -4334,7 +4334,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\g14d5954\\.nuget\\packages\\": {},
+    "C:\\Users\\g16p5758\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
@@ -4344,18 +4344,18 @@
       "hideWarningsAndErrors": true
     },
     "restore": {
-      "projectUniqueName": "J:\\Morabaraba\\Morabaraba\\Morabaraba.fsproj",
+      "projectUniqueName": "J:\\test\\Morabaraba\\Morabaraba\\Morabaraba.fsproj",
       "projectName": "Morabaraba",
-      "projectPath": "J:\\Morabaraba\\Morabaraba\\Morabaraba.fsproj",
-      "packagesPath": "C:\\Users\\g14d5954\\.nuget\\packages\\",
-      "outputPath": "J:\\Morabaraba\\Morabaraba\\obj\\",
+      "projectPath": "J:\\test\\Morabaraba\\Morabaraba\\Morabaraba.fsproj",
+      "packagesPath": "C:\\Users\\g16p5758\\.nuget\\packages\\",
+      "outputPath": "J:\\test\\Morabaraba\\Morabaraba\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\g14d5954\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\g16p5758\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
       ],
