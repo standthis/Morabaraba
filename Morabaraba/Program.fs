@@ -29,13 +29,13 @@ type Mil = {                                            //used for creating all 
     Coords: Coords list;                                //list to store the 3 coordinates that create a mill
   }
 
-let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 4; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
-let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 4; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
+let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
+let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
 
 let Players = [Player_1;Player_2]                                                                                                   //list of the two players (used to alternate between the two players depending on whose turn it is)
 
 let removePiece (player:Player) (piece:Coords)=
-   {player with Positions= List.filter (fun x -> x.Pos<>piece.Pos) player.Positions }
+    {player with Positions= List.filter (fun x -> x.Pos<>piece.Pos) player.Positions }
                 //remove play
 let isValidMove (coord:char*int) availableBoard = //try make a move using the available board
     (List.filter (fun x -> x.Pos=coord) availableBoard).Length <> 0; //if the length is not 0 this means a position that you tried to move to was taken
@@ -157,40 +157,16 @@ let printBoard (board:Coords list) (players:Player list) = //print a board b
                         board.[15].Symbol board.[16].Symbol board.[17].Symbol board.[18].Symbol board.[19].Symbol board.[20].Symbol board.[21].Symbol board.[22].Symbol board.[23].Symbol
     printf "%s" boardString
 
-let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) (equalToOp: bool) = //returns coords in boardToFilterOut that aren't in filterBoard
-    match equalToOp with
-    | true -> 
-            let rec filterOutEqual (xs:Coords list) out acc = 
-                match xs with
-                | []->acc
-                | a::rest-> 
-                           let filteredList= (List.filter (fun x -> (a.Pos = x.Pos) ) out)
-                            // operation allows filters depending on given operator (filters those that are equal or those that are not )
-                           filterOutEqual rest (List.filter (fun x -> (a.Pos <> x.Pos) ) out) acc@filteredList
-            filterOutEqual filterBoard boardToFilterOut []  //filterOut
-    | _ -> 
-          let rec filterOutNotEqual (xs:Coords list) out = 
-            match xs with
-            | []->out
-            | a::rest-> 
-                        // operation allows filters depending on given operator (filters those that are equal or those that are not )
-                        filterOutNotEqual rest (List.filter (fun x -> (a.Pos <> x.Pos) ) out)
-          filterOutNotEqual filterBoard boardToFilterOut  //filterOut
-        
-
+let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) = //returns coords in boardToFilterOut that aren't in filterBoard
+    List.filter (fun x -> (List.filter (fun y -> x.Pos = y.Pos) filterBoard).Length =0) boardToFilterOut
+    //maybe change x and y variable names)
 
 let getCurrentBoard (playerPositions:(Coords list))  =
-    let rec changeBoard (xs:Coords list) (out:Coords list) = 
-        match xs with
-        | []->out
-        | a::rest-> changeBoard rest (List.map (fun x -> 
-            match x.Pos=a.Pos with
-            | true -> {x with Symbol = a.Symbol}
-            | _ -> x) out ) 
-             
-    changeBoard playerPositions startBoard  //filterOut
-
-
+    List.map (fun x -> let k= (List.filter (fun y -> y.Pos = x.Pos) playerPositions)
+                       match k.Length with
+                       | 0 -> x
+                       | _ -> {x with Symbol  =  k.[0].Symbol} ) startBoard
+  
 let getCoords (pos:char*int) = //get the Coord type given pos and character to fill it with
     (List.filter (fun x-> x.Pos=pos)startBoard).[0]
 
@@ -223,17 +199,7 @@ let rec getPlayerMove (player:Player) availableBoard =
                         getPlayerMove player availableBoard
         | _ -> printfn "You have no cow at %A" fromPos
                getPlayerMove player availableBoard 
-   // | _ -> failwith "Game is bugged!"
 
-
-  //getAvailableBoard 
-  //get the avaibleBoard given both player lists of positions
-  //check playerState of whichPlayer
-  //get input from whichPlayer depending on state
-  //check if input from user was valid
-  //if move was valid move piece to desired location
-  //change player to contain new list of positions placed
-  //change numberofPieces and change state if neccessary
 let placeMove player pos = 
    addPiece player ({(getCoords pos) with Symbol = player.Symbol }) 
    |> decrementPieces |> checkStateChange //move was valid
@@ -245,7 +211,8 @@ let movePiece (player:Player) (from:char*int) (to_:char*int)=  //assumes coords 
                                                   | _ -> x ) player.Positions  } //return the player with new positions
 
 let getPlayerMills (player:Player) = 
-    List.filter (fun x-> (filterOutBoard player.Positions x true).Length=3) allBoardMills
+    List.filter (fun mill-> (filterOutBoard player.Positions mill).Length=0) allBoardMills
+    //remove every thing in mill that's in player.Positions
 
 let isInMill toPos playerMills =
    (List.filter( fun mill -> (List.filter (fun x -> x.Pos=toPos) mill).Length > 0)  
@@ -273,14 +240,13 @@ let rec killCow (player: Player)=
         printfn "No valid cow was in pos %A" pos
         killCow player 
 
-    
-  
+let endGame (winner:Player)=
+    printfn "Game has ended\n%s won, with %d cows still alive!" winner.Name winner.Positions.Length
 
-    
 let rec runGame (players:Player list) = //pass message saying where player moved or that 
     //if error don't do next 3 lines error means move was not valid
     let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
-    let availableBoard = filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard false //the avaialble positions 
+    let availableBoard = filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard  //the avaialble positions 
 
     printBoard currentBoard players //print the board
     let fromPos,toPos = getPlayerMove players.[0] availableBoard//the positon the player wants to move to
@@ -290,7 +256,7 @@ let rec runGame (players:Player list) = //pass message saying where player moved
         | _ -> movePiece players.[0] fromPos toPos // if flying or moving 
            
     let playerMills= getPlayerMills updatedPlayer
-    let updatedOtherPlayer=
+    let updatedEnemyPlayer=
         match isInMill toPos playerMills with
         | true -> 
                   let newBoard= getCurrentBoard (updatedPlayer.Positions @ players.[1].Positions)
@@ -299,20 +265,13 @@ let rec runGame (players:Player list) = //pass message saying where player moved
         | _ -> players.[1]
     
     //check if game should end
-    match updatedOtherPlayer.Positions.Length=2 && updatedOtherPlayer.PlayerState=FLYING with
-    | true ->  printfn "End game"
-    | _ ->  runGame [updatedOtherPlayer;updatedPlayer]
+    match updatedEnemyPlayer.Positions.Length=2 && updatedEnemyPlayer.PlayerState=FLYING with
+    | true ->  endGame updatedPlayer//must be pure so let another function print
+    | _ ->  runGame [updatedEnemyPlayer;updatedPlayer] //change player turns
 
-             //add other state options
-   
-
-
-
+            
 let startGame () = 
     runGame Players //start the game
-
-     
-
 
 [<EntryPoint>]
 let main argv =
@@ -327,4 +286,36 @@ let main argv =
 
 
                
-         
+         (* match equalToOp with
+       | true -> 
+               let rec filterOutEqual (xs:Coords list) out acc = 
+                   match xs with
+                   | []->acc
+                   | a::rest-> 
+                              let filteredList= (List.filter (fun x -> (a.Pos = x.Pos) ) out)
+                               // operation allows filters depending on given operator (filters those that are equal or those that are not )
+                              filterOutEqual rest (List.filter (fun x -> (a.Pos <> x.Pos) ) out) acc@filteredList
+               filterOutEqual filterBoard boardToFilterOut []  //filterOut
+       | _ -> 
+             let rec filterOutNotEqual (xs:Coords list) out = 
+               match xs with
+               | []->out
+               | a::rest-> 
+                           // operation allows filters depending on given operator (filters those that are equal or those that are not )
+                           filterOutNotEqual rest (List.filter (fun x -> (a.Pos <> x.Pos) ) out)
+             filterOutNotEqual filterBoard boardToFilterOut  //filterOut
+          *)
+
+    (*let rec changeBoard (xs:Coords list) (out:Coords list) = 
+        match xs with
+        | []->out
+        | a::rest-> changeBoard rest (List.map (fun x -> 
+            match x.Pos=a.Pos with
+            | true -> {x with Symbol = a.Symbol}
+            | _ -> x) out ) 
+             
+    changeBoard playerPositions startBoard  //filterOut *)
+
+    //  let g=[A1;D2;A4;D1;D3;G1;F4;A7]
+      //printfn "%A" (List.filter (fun x-> (filterOutBoard g x true).Length=0) allBoardMills)
+      //testing getMills function and i think it works
