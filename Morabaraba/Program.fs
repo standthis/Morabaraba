@@ -159,6 +159,8 @@ let printBoard (board:Coords list) (players:Player list) = //print a board b
 let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) = //returns coords in boardToFilterOut that aren't in filterBoard
     List.filter (fun x -> (List.filter (fun y -> x.Pos = y.Pos) filterBoard).Length =0) boardToFilterOut
     //maybe change x and y variable names)
+let getAvailableBoard (board:Coords list):Coords list =
+    List.filter (fun x-> x.Symbol = ' ') board 
 
 let getCurrentBoard (playerPositions:(Coords list))  =
     List.map (fun x -> let k= (List.filter (fun y -> y.Pos = x.Pos) playerPositions)
@@ -247,7 +249,9 @@ let endGame (winner:Player)=
 let rec runGame (players:Player list) = //pass message saying where player moved or that 
     //if error don't do next 3 lines error means move was not valid
     let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
-    let availableBoard = filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard  //the avaialble positions 
+    let availableBoard = getAvailableBoard currentBoard
+    //could use filterOutBoard but it's less efficient and is O(N^2) whilst getAvaiableBoard is O(N)
+    //filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard  //the avaialble positions 
 
     printBoard currentBoard players //print the board
     let fromPos,toPos = getPlayerMove players.[0] availableBoard//the positon the player wants to move to
