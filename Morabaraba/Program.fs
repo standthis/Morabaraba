@@ -1,5 +1,6 @@
 ﻿// Learn more about F# at http://fsharp.org
 open System
+open System.IO.Compression
 
 
  type Coords = {                                        //used to store all information needed about each coordinate (or board space) on the board
@@ -27,22 +28,32 @@ type Mil = {                                            //used for creating all 
     Coords: Coords list;                                //list to store the 3 coordinates that create a mill
   }
 
-let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
-let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
+let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 4; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
+let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 4; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
 
 let Players = [Player_1;Player_2]                                                                                                   //list of the two players (used to alternate between the two players depending on whose turn it is)
 
-//  let removePiece (player:Player) (piece:Coord)= //remove play
-let makeMove (coord:char*int) availableBoard = //try make a move using the available board
+let removePiece (player:Player) (piece:Coords)=
+   {player with Positions= List.filter (fun x -> x<>piece) player.Positions }
+                //remove play
+let isValidMove (coord:char*int) availableBoard = //try make a move using the available board
     (List.filter (fun x -> x.Pos=coord) availableBoard).Length <> 0; //if the length is not 0 this means a position that you tried to move to was taken
-   
+
 let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }                                   //decreases the number of unplayed pieces a given player has by 1
 let changePlayerState (player:Player) newState = { player with PlayerState = newState }                                             //sets the given player's state to the given state
 let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                   //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
-let movePiece (player:Player) (from:char*int) (to_:char*int)=  //assumes coords passed are valid
-    { player with Positions = List.map (fun x -> match x.Pos=from with 
-                                                  | true -> { x with Pos = to_} 
-                                                  | _ -> x ) player.Positions  } //return the player with new positions
+let checkStateChange (player:Player) =
+    match player.PlayerState with
+    | PLACING -> 
+        match player.NumberOfPieces = 0 with 
+        | true -> changePlayerState player MOVING
+        | _ -> player 
+    | MOVING -> 
+        match player.Positions.Length = 3 with 
+        | true -> changePlayerState player FLYING
+        | _ -> player
+    | _ -> player  
+        
 
   
 let A1 = {Pos=('A',1);Layer=3;Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  //
@@ -144,18 +155,35 @@ let getCurrentBoard (playerPositions:(Coords list))  =
 
 let getCoords (pos:char*int) = //get the Coord type given pos and character to fill it with
     (List.filter (fun x-> x.Pos=pos)startBoard).[0]
+
+let getPos param = 
+    printfn "Where do you want to move %s " param
+    printf "Row:" 
+    let row= Char.ToUpper(Console.ReadLine().[0])
+    printf "Column: " 
+    let col = int (Console.ReadLine())
+    (row,col)
      
-let getPlayerMove (player:Player) : (char*int) =
+let rec getPlayerMove (player:Player) availableBoard =
+    printfn "%s's turn" player.Name 
     match player.PlayerState with
     | PLACING -> 
-        printfn "%s's turn(%d pieces left)" player.Name player.NumberOfPieces
-        printf "Row:" 
-        let row= Char.ToUpper(Console.ReadLine().[0])
-        printf "Column: " 
-        let col = int (Console.ReadLine())
-        (row,col)
-    | MOVING -> ('A',0) //placeholder
-    | FLYING -> ('A',0) //placeholder
+        let toPos=getPos "to"
+        match isValidMove toPos availableBoard with 
+        | true ->  ('Z',100) , toPos
+        | _ -> printfn "%A is not a valid move" toPos
+               getPlayerMove player availableBoard 
+    | _ ->
+        let fromPos= getPos "from"
+        match isValidMove fromPos player.Positions with
+        | true -> 
+                 let toPos= getPos "to"
+                 match isValidMove toPos availableBoard && ( isValidMove toPos (List.map (fun x -> getCoords x ) (getCoords fromPos).PossibleMoves) || player.PlayerState = FLYING ) with 
+                 | true -> fromPos, toPos
+                 | _ -> printfn "You cannot move from %A to %A" fromPos toPos
+                        getPlayerMove player availableBoard
+        | _ -> printfn "You have no cow at %A" fromPos
+               getPlayerMove player availableBoard 
    // | _ -> failwith "Game is bugged!"
 
 
@@ -167,24 +195,31 @@ let getPlayerMove (player:Player) : (char*int) =
   //if move was valid move piece to desired location
   //change player to contain new list of positions placed
   //change numberofPieces and change state if neccessary
+let placeMove player pos = 
+   addPiece player ({(getCoords pos) with Symbol = player.Symbol }) 
+   |> decrementPieces |> checkStateChange //move was valid
+                   //use piping when using more functions on the player
+                      
+let movePiece (player:Player) (from:char*int) (to_:char*int)=  //assumes coords passed are valid
+    { player with Positions = List.map (fun x -> match x.Pos=from with 
+                                                  | true -> { x with Pos = to_} 
+                                                  | _ -> x ) player.Positions  } //return the player with new positions
+    
 
 let rec runGame (players:Player list) = //pass message saying where player moved or that 
     //if error don't do next 3 lines error means move was not valid
     let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
     let availableBoard = filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard //the avaialble positions
     printBoard currentBoard players //print the board
-    let pos= getPlayerMove players.[0]//the positon the player wants to move to
-    let updatedPlayer=
-        match makeMove pos availableBoard with //try to make a move to the available board
-        | true -> 
-                   addPiece players.[0] ({(getCoords pos) with Symbol = players.[0].Symbol }) 
-                   |> decrementPieces  //move was valid
-                   //use piping when using more functions on the player
-                  
-        | _ ->
-            printfn "Pos is %A is not a valid position" pos
-            runGame players //make the move again (will make more efficient later)
-    
+    let fromPos,toPos = getPlayerMove players.[0] availableBoard//the positon the player wants to move to
+    let updatedPlayer =
+        match players.[0].PlayerState with
+        | PLACING -> placeMove players.[0] toPos 
+        | _ -> movePiece players.[0] fromPos toPos // if flying or moving 
+           
+     //check for mills
+
+             //add other state options
     runGame [players.[1];updatedPlayer]
 
 
