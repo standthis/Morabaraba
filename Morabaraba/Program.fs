@@ -28,11 +28,6 @@ type Mil = {                                            //used for creating all 
     Coords: Coords list;                                //list to store the 3 coordinates that create a mill
   }
 
-type test = 
-| IsInt of int 
-| IsNotInt of Object 
-    
-
 let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
 let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
 
@@ -177,32 +172,30 @@ let getCoords (pos:char*int) = //get the Coord type given pos and character to f
     (List.filter (fun x-> x.Pos=pos)startBoard).[0]
 
 
-let getPos what = 
+let rec getPos what = 
     printfn "%s " what
     printf "Row:" 
     let row= Char.ToUpper(Console.ReadLine().[0])
     printf "Column: " 
     let getCol = Console.ReadLine()
-    let is_numeric a = fst (System.Int32.TryParse(getCol))
-    let col =
-        match is_numeric getCol with                        // Check if user input for column is an int
-        | true -> int getCol 
-        | _ ->
-            printfn "%A is not a number! Col requires a number \n " getCol 
-            0
-    (row, col)
+    let is_numeric ,_ = System.Int32.TryParse(getCol)
+    match is_numeric with                        // Check if user input for column is an int
+    | true -> (row,(int getCol)) 
+    | _ -> printfn "%A is not a number! Col requires a number " getCol 
+           getPos what
+           
+
      
 let rec getPlayerMove (player:Player) availableBoard =
-    printfn "%s's turn" player.Name 
     match player.PlayerState with
     | PLACING -> 
-        let toPos=getPos "Where do you want to place the cow?"
+        let toPos=getPos (sprintf "%s's turn\nWhere do you want to place the cow?" player.Name)
         match isValidMove toPos availableBoard with 
         | true ->  ('Z',100) , toPos
         | _ -> printfn "%A is not a valid move" toPos
                getPlayerMove player availableBoard 
     | _ ->
-        let fromPos= getPos "Where do you want to move the cow from?"
+        let fromPos= getPos (sprintf "%s's turn\nWhere do you want to move the cow from?" player.Name)
         match isValidMove fromPos player.Positions with
         | true -> 
                  let toPos= getPos "Where do you want to move the cow to?"
