@@ -28,6 +28,11 @@ type Mil = {                                            //used for creating all 
     Coords: Coords list;                                //list to store the 3 coordinates that create a mill
   }
 
+type test = 
+| IsInt of int 
+| IsNotInt of Object 
+    
+
 let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
 let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
 
@@ -55,7 +60,7 @@ let checkStateChange (player:Player) =
     | _ -> player  
         
 
-  
+ 
 let A1 = {Pos=('A',1);Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  //
 let A4 = {Pos=('A',4);Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
 let A7 = {Pos=('A',7);Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
@@ -117,6 +122,7 @@ let EG57 = [E5; F6; G7]
 let allBoardMills = [ AA17; BB26; CC35; DD13; DD57; EE35; FF26; GG17; AG11; BF22; CE33; AC44; EG44; CE55; BF66; AG77; AC13; CA57; GE13; EG57 ]
 
 let printBoard (board:Coords list) (players:Player list) = //print a board b
+    System.Console.Clear ()
     let ps1, ps2, player1, player2 =
         match players.[0].ID with
         | 1 -> '*',' ',players.[0],players.[1]
@@ -161,7 +167,6 @@ let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) 
     //maybe change x and y variable names)
 let getAvailableBoard (board:Coords list):Coords list =
     List.filter (fun x-> x.Symbol = ' ') board 
-
 let getCurrentBoard (playerPositions:(Coords list))  =
     List.map (fun x -> let k= (List.filter (fun y -> y.Pos = x.Pos) playerPositions)
                        match k.Length with
@@ -171,13 +176,21 @@ let getCurrentBoard (playerPositions:(Coords list))  =
 let getCoords (pos:char*int) = //get the Coord type given pos and character to fill it with
     (List.filter (fun x-> x.Pos=pos)startBoard).[0]
 
+
 let getPos what = 
     printfn "%s " what
     printf "Row:" 
     let row= Char.ToUpper(Console.ReadLine().[0])
     printf "Column: " 
-    let col = int (Console.ReadLine())
-    (row,col)
+    let getCol = Console.ReadLine()
+    let is_numeric a = fst (System.Int32.TryParse(getCol))
+    let col =
+        match is_numeric getCol with                        // Check if user input for column is an int
+        | true -> int getCol 
+        | _ ->
+            printfn "%A is not a number! Col requires a number \n " getCol 
+            0
+    (row, col)
      
 let rec getPlayerMove (player:Player) availableBoard =
     printfn "%s's turn" player.Name 
@@ -204,7 +217,7 @@ let rec getPlayerMove (player:Player) availableBoard =
 let placeMove player pos = 
    addPiece player ({(getCoords pos) with Symbol = player.Symbol }) 
    |> decrementPieces |> checkStateChange //move was valid
-                   //use piping when using more functions on the player
+                   //use piping when using more functions on the player 
                       
 let movePiece (player:Player) (from:char*int) (to_:char*int)=  //assumes coords passed are valid
     { player with Positions = List.map (fun x -> match x.Pos=from with 
