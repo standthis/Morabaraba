@@ -28,8 +28,8 @@ type Mil = {                                            //used for creating all 
     Coords: Coords list;                                //list to store the 3 coordinates that create a mill
   }
 
-let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
-let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 6; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
+let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
+let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
 
 let Players = [Player_1;Player_2]                                                                                                   //list of the two players (used to alternate between the two players depending on whose turn it is)
 
