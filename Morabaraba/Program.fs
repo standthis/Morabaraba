@@ -3,6 +3,8 @@ open System
 open System.IO.Compression
 open System.Security.Cryptography
 
+//------------------------------data stucture-------------------------------------
+
  type Coords = {                                        //used to store all information needed about each coordinate (or board space) on the board
     Pos: char * int                                     //the actual coordinates of the board space eg. (A,1)                                      //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
     Symbol: char                                        //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
@@ -23,35 +25,31 @@ type Player =  {                                        //used to store player s
     Positions: Coords List                              //The list of all coordinates the player has a cow placed
   }
 
-let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
-let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
+//------------------------------end data stucture-------------------------------------
 
-let Players = [Player_1;Player_2]                                                                                                   //list of the two players (used to alternate between the two players depending on whose turn it is)
+//----------------------------hardcoded information-----------------------------------
 
-let removePiece (player:Player) (piece:Coords)=
-    {player with Positions= List.filter (fun x -> x.Pos<>piece.Pos) player.Positions }
-                //remove play
-let isValidMove (coord:char*int) availableBoard = //try make a move using the available board
-    (List.filter (fun x -> x.Pos=coord) availableBoard).Length <> 0; //if the length is not 0 this means a position that you tried to move to was taken
+let Player_1 = {                                                                            //Player 1's initial data
+    Name = "Player 1"
+    ID = 1 
+    Symbol = 'x'
+    NumberOfPieces = 12
+    PlayerState = PLACING
+    Positions = []
+    }
 
-let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }                                   //decreases the number of unplayed pieces a given player has by 1
-let changePlayerState (player:Player) newState = { player with PlayerState = newState }                                             //sets the given player's state to the given state
-let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                   //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
+let Player_2 = {                                                                            //Player 2's initial data
+    Name = "Player 2"
+    ID = 2
+    Symbol = 'o'
+    NumberOfPieces = 12
+    PlayerState = PLACING
+    Positions = []
+    }
 
-let checkStateChange (player:Player) =
-    match player.PlayerState with
-    | PLACING -> 
-        match player.NumberOfPieces = 0 with 
-        | true -> changePlayerState player MOVING
-        | _ -> player 
-    | MOVING -> 
-        match player.Positions.Length = 3 with 
-        | true -> changePlayerState player FLYING
-        | _ -> player
-    | _ -> player  
-        
-// Here lies all coordinates 
-let A1 = {Pos=('A',1);Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  
+let Players = [Player_1;Player_2]                                                           //list of the two players (used to alternate between the two players depending on whose turn it is)
+
+let A1 = {Pos=('A',1);Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                  //all individual board coordinates and their relevant data                          
 let A4 = {Pos=('A',4);Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
 let A7 = {Pos=('A',7);Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
 
@@ -83,12 +81,10 @@ let G1 = {Pos=('G',1);Symbol=' ';PossibleMoves=[('D',1);('F',2);('G',4)] }
 let G4 = {Pos=('G',4);Symbol=' ';PossibleMoves=[('F',4);('G',1);('G',7)] }
 let G7 = {Pos=('G',7);Symbol=' ';PossibleMoves=[('D',7);('F',6);('G',4)] }
 
-// List of all coordinates 
-let startBoard = [ A1; A4; A7; B2; B4; B6; C3; C4; C5; D1; D2; D3; D5; D6; D7; E3; E4; E5; F2; F4; F6; G1; G4; G7 ]
+let startBoard = [ A1; A4; A7; B2; B4; B6; C3; C4; C5; D1; D2; D3; D5; D6; D7; E3; E4; E5; F2; F4; F6; G1; G4; G7 ] //the board consisting of all the coordinates
 
-// Here lies all possible mills 
 
-let AA17 = [A1; A4; A7]
+let AA17 = [A1; A4; A7]                                                                     //all coordinate combinations that can form a mill (if all are occupied by the same player)
 let BB26 = [B2; B4; B6]
 let CC35 = [C3; C4; C5]
 let DD13 = [D1; D2; D3]
@@ -112,7 +108,35 @@ let GE13 = [G1; F2; E3]
 let EG57 = [E5; F6; G7]
 
 
-let allBoardMills = [ AA17; BB26; CC35; DD13; DD57; EE35; FF26; GG17; AG11; BF22; CE33; AC44; EG44; CE55; BF66; AG77; AC13; CA57; GE13; EG57 ]
+let allBoardMills = [ AA17; BB26; CC35; DD13; DD57; EE35; FF26; GG17; AG11; BF22; CE33; AC44; EG44; CE55; BF66; AG77; AC13; CA57; GE13; EG57 ] //list of all possible mill combinations
+
+//---------------------------end hardcoded information-----------------------------------
+
+//----------------------------------game code--------------------------------------------
+
+let removePiece (player:Player) (piece:Coords) = {player with Positions= List.filter (fun x -> x.Pos<>piece.Pos) player.Positions }     //returns a new player the same as the given player, but with it's list of positions not containing the given coordinate
+    
+let isValidMove (coord:char*int) availableBoard = List.exists (fun x -> x.Pos=coord) availableBoard                                     //checks if the given coordinate is available (no cows are currently at that coordinate)
+    
+let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }                                       //decreases the number of unplayed pieces that a given player has by 1
+
+let changePlayerState (player:Player) newState = { player with PlayerState = newState }                                                 //sets the given player's state to the given state
+
+let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                       //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
+
+let checkStateChange (player:Player) =
+    match player.PlayerState with
+    | PLACING -> 
+        match player.NumberOfPieces = 0 with 
+        | true -> changePlayerState player MOVING
+        | _ -> player 
+    | MOVING -> 
+        match player.Positions.Length = 3 with 
+        | true -> changePlayerState player FLYING
+        | _ -> player
+    | _ -> player  
+        
+
 
 let printBoard (board:Coords list) (players:Player list) = //print a board b
     System.Console.Clear ()
