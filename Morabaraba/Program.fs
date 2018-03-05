@@ -3,7 +3,6 @@ open System
 open System.IO.Compression
 open System.Security.Cryptography
 
-
  type Coords = {                                        //used to store all information needed about each coordinate (or board space) on the board
     Pos: char * int                                     //the actual coordinates of the board space eg. (A,1)                                      //which 'square' on the board this board space is found in (inner block = 1, middle block = 2 and outer block =3)
     Symbol: char                                        //the symbol currently shown as that board space (0 means unoccupied, anything else is a player's tile)
@@ -24,10 +23,6 @@ type Player =  {                                        //used to store player s
     Positions: Coords List                              //The list of all coordinates the player has a cow placed
   }
 
-type Mil = {                                            //used for creating all possible mills that can be formed (a mill is 3 coordinates in a straight line)
-    Coords: Coords list;                                //list to store the 3 coordinates that create a mill
-  }
-
 let Player_1 = { Name = "Player 1"; ID = 1 ; Symbol = 'x'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 1's initial data
 let Player_2 = { Name = "Player 2"; ID = 2 ; Symbol = 'o'; NumberOfPieces = 12; PlayerState = PLACING; Positions = [] }             //Player 2's initial data
 
@@ -42,6 +37,7 @@ let isValidMove (coord:char*int) availableBoard = //try make a move using the av
 let decrementPieces (player:Player) = {player with NumberOfPieces = (player.NumberOfPieces - 1) }                                   //decreases the number of unplayed pieces a given player has by 1
 let changePlayerState (player:Player) newState = { player with PlayerState = newState }                                             //sets the given player's state to the given state
 let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                   //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
+
 let checkStateChange (player:Player) =
     match player.PlayerState with
     | PLACING -> 
@@ -54,9 +50,8 @@ let checkStateChange (player:Player) =
         | _ -> player
     | _ -> player  
         
-
- 
-let A1 = {Pos=('A',1);Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  //
+// Here lies all coordinates 
+let A1 = {Pos=('A',1);Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                                                  
 let A4 = {Pos=('A',4);Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
 let A7 = {Pos=('A',7);Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
 
@@ -88,8 +83,10 @@ let G1 = {Pos=('G',1);Symbol=' ';PossibleMoves=[('D',1);('F',2);('G',4)] }
 let G4 = {Pos=('G',4);Symbol=' ';PossibleMoves=[('F',4);('G',1);('G',7)] }
 let G7 = {Pos=('G',7);Symbol=' ';PossibleMoves=[('D',7);('F',6);('G',4)] }
 
+// List of all coordinates 
 let startBoard = [ A1; A4; A7; B2; B4; B6; C3; C4; C5; D1; D2; D3; D5; D6; D7; E3; E4; E5; F2; F4; F6; G1; G4; G7 ]
 
+// Here lies all possible mills 
 
 let AA17 = [A1; A4; A7]
 let BB26 = [B2; B4; B6]
@@ -114,6 +111,7 @@ let CA57 = [C5; B6; A7]
 let GE13 = [G1; F2; E3]
 let EG57 = [E5; F6; G7]
 
+
 let allBoardMills = [ AA17; BB26; CC35; DD13; DD57; EE35; FF26; GG17; AG11; BF22; CE33; AC44; EG44; CE55; BF66; AG77; AC13; CA57; GE13; EG57 ]
 
 let printBoard (board:Coords list) (players:Player list) = //print a board b
@@ -137,7 +135,7 @@ let printBoard (board:Coords list) (players:Player list) = //print a board b
       |   |  \        |       /  |   |
   C   |   |  (%c)-----(%c)----(%c)  |   |          %cPlayer 1 (%c)           %cPlayer 2 (%c)
       |   |   |              |   |   |          ----------              ----------
-      |   |   |              |   |   |          Unplaced Cows : %d       Unplaced Cows : %d
+      |   |   |              |   |   |          Unplaced Cows : %d      Unplaced Cows : %d
   D  (%c)-(%c)-(%c)            (%c)-(%c)-(%c)         Cows alive : %d          Cows alive : %d
       |   |   |              |   |   |          Cows killed : %d         Cows killed : %d
       |   |   |              |   |   |
@@ -252,10 +250,19 @@ let rec killCow (player: Player)=
 let endGame (winner:Player)=
     printfn "Game has ended\n%s won, with %d cows still alive!" winner.Name winner.Positions.Length
 
+let noMoveMessage (winner:Player) (loser:Player) =
+    printfn "%s has no moves to play\n. Therefore %s wins the game with %d cows left." loser.Name winner.Name winner.Positions.Length
+
+    // checks whether a player has any possible moves left to play
+let moveExists (player: Player) (availableBoard: Coords List) = 
+    let possiblePlayerMoves = List.map getCoords (List.fold (fun intial (item:Coords) -> item.PossibleMoves@intial) [] player.Positions)
+    (filterOutBoard possiblePlayerMoves availableBoard).Length > 0
+
 let rec runGame (players:Player list) = //pass message saying where player moved or that 
     //if error don't do next 3 lines error means move was not valid
     let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
     let availableBoard = getAvailableBoard currentBoard
+    // Current player has no moves to play
     //could use filterOutBoard but it's less efficient and is O(N^2) whilst getAvaiableBoard is O(N)
     //filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard  //the avaialble positions 
 
@@ -276,11 +283,14 @@ let rec runGame (players:Player list) = //pass message saying where player moved
         | _ -> players.[1]
     
     //check if game should end
-    match updatedEnemyPlayer.Positions.Length=2 && updatedEnemyPlayer.PlayerState=FLYING with
-    | true ->  endGame updatedPlayer//must be pure so let another function print
+    let movable = moveExists updatedEnemyPlayer availableBoard
+    match (updatedEnemyPlayer.Positions.Length=2 && updatedEnemyPlayer.PlayerState=FLYING) || (updatedEnemyPlayer.PlayerState=MOVING && not movable) with
+    | true -> 
+        match not movable with  
+        | true -> noMoveMessage updatedPlayer updatedEnemyPlayer
+        | _ -> endGame updatedPlayer//must be pure so let another function print
     | _ ->  runGame [updatedEnemyPlayer;updatedPlayer] //change player turns
 
-            
 let startGame () = 
     runGame Players //start the game
 
@@ -289,44 +299,4 @@ let main argv =
     printfn "Hello World from F#!"
     startGame ()
     Console.ReadKey()
-   
-    //startGame ()
     0 // return an integer exit code
-
-
-
-
-               
-         (* match equalToOp with
-       | true -> 
-               let rec filterOutEqual (xs:Coords list) out acc = 
-                   match xs with
-                   | []->acc
-                   | a::rest-> 
-                              let filteredList= (List.filter (fun x -> (a.Pos = x.Pos) ) out)
-                               // operation allows filters depending on given operator (filters those that are equal or those that are not )
-                              filterOutEqual rest (List.filter (fun x -> (a.Pos <> x.Pos) ) out) acc@filteredList
-               filterOutEqual filterBoard boardToFilterOut []  //filterOut
-       | _ -> 
-             let rec filterOutNotEqual (xs:Coords list) out = 
-               match xs with
-               | []->out
-               | a::rest-> 
-                           // operation allows filters depending on given operator (filters those that are equal or those that are not )
-                           filterOutNotEqual rest (List.filter (fun x -> (a.Pos <> x.Pos) ) out)
-             filterOutNotEqual filterBoard boardToFilterOut  //filterOut
-          *)
-
-    (*let rec changeBoard (xs:Coords list) (out:Coords list) = 
-        match xs with
-        | []->out
-        | a::rest-> changeBoard rest (List.map (fun x -> 
-            match x.Pos=a.Pos with
-            | true -> {x with Symbol = a.Symbol}
-            | _ -> x) out ) 
-             
-    changeBoard playerPositions startBoard  //filterOut *)
-
-    //  let g=[A1;D2;A4;D1;D3;G1;F4;A7]
-      //printfn "%A" (List.filter (fun x-> (filterOutBoard g x true).Length=0) allBoardMills)
-      //testing getMills function and i think it works
