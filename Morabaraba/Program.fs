@@ -124,7 +124,7 @@ let changePlayerState (player:Player) newState = { player with PlayerState = new
 
 let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                       //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
 
-let checkStateChange (player:Player) =
+let checkStateChange (player:Player) =                                                                                                  //checks if a given player satisfies the conditions which induce a change of state, and if they do, it returns a new player the same as the given player, but with the new state as it's state
     match player.PlayerState with
     | PLACING -> 
         match player.NumberOfPieces = 0 with 
@@ -136,16 +136,13 @@ let checkStateChange (player:Player) =
         | _ -> player
     | _ -> player  
         
-
-
-let printBoard (board:Coords list) (players:Player list) = //print a board b
+let printBoard (board:Coords list) (players:Player list) =                                                                              //prints the board that represents the data given by a list of coordinates and information about the current players given by a player list
     System.Console.Clear ()
     let ps1, ps2, player1, player2 =
         match players.[0].ID with
         | 1 -> '*',' ',players.[0],players.[1]
         | _ -> ' ','*',players.[1],players.[0]
-     
-
+                                                                                                                                        //the hardcoded board structure
     let boardString = sprintf  """
       1   2   3       4      5   6   7
  
@@ -179,41 +176,36 @@ let printBoard (board:Coords list) (players:Player list) = //print a board b
                         board.[15].Symbol board.[16].Symbol board.[17].Symbol board.[18].Symbol board.[19].Symbol board.[20].Symbol board.[21].Symbol board.[22].Symbol board.[23].Symbol
     printf "%s" boardString
 
-let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) = //returns coords in boardToFilterOut that aren't in filterBoard
-    List.filter (fun x -> (List.filter (fun y -> x.Pos = y.Pos) filterBoard).Length =0) boardToFilterOut
-    //maybe change x and y variable names)
-let getAvailableBoard (board:Coords list):Coords list =
-    List.filter (fun x-> x.Symbol = ' ') board 
-let getCurrentBoard (playerPositions:(Coords list))  =
-    List.map (fun x -> let k= (List.filter (fun y -> y.Pos = x.Pos) playerPositions)
+let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) = List.filter (fun x -> (List.filter (fun y -> x.Pos = y.Pos) filterBoard).Length =0) boardToFilterOut  //returns a list of coordinates that appear in a given 'boardToFilterOut' and not in a given 'filterBoard' (filters one board according to another)
+    
+let getAvailableBoard (board:Coords list):Coords list = List.filter (fun x-> x.Symbol = ' ') board                                      //returns a list of coordinates that represent the epmty spaces on a given board (a given list of coordinates)
+    
+let getCurrentBoard (playerPositions:(Coords list)) =                                                                                   //returns a list of coordinates that represent the current board. In other words, it uses the given list (of the two player's coordinates lists combined) and fills in the unused coordinates with the relative coords from the start board.
+    List.map (fun x -> let k = (List.filter (fun y -> y.Pos = x.Pos) playerPositions)
                        match k.Length with
                        | 0 -> x
                        | _ -> {x with Symbol  =  k.[0].Symbol} ) startBoard
   
-let getCoords (pos:char*int) = //get the Coord type given pos and character to fill it with
-    (List.filter (fun x-> x.Pos=pos)startBoard).[0]
-
-
-let rec getPos what = 
+let getCoords (pos:char*int) = (List.filter (fun x-> x.Pos=pos)startBoard).[0]                                                          //returns the coordinate whose position is represented by the given tuple
+    
+let rec getPos what =                                                                                                                   //Asks for user input and returns the tuple of the coordinate they entered
     printfn "%s " what
     printf "Row:" 
     let row= Char.ToUpper(Console.ReadLine().[0])
     printf "Column: " 
     let getCol = Console.ReadLine()
     let is_numeric ,_ = System.Int32.TryParse(getCol)
-    match is_numeric with                        // Check if user input for column is an int
+    match is_numeric with                                                                                                               //(check if user input for column is an int)
     | true -> (row,(int getCol)) 
     | _ -> printfn "%A is not a number! Col requires a number " getCol 
            getPos what
-           
-
      
-let rec getPlayerMove (player:Player) availableBoard =
+let rec getPlayerMove (player:Player) availableBoard =                                                                                  //Begins the move of a given player. Requires a coords list of the current available board to help determine if the move is valid
     match player.PlayerState with
-    | PLACING -> 
+    | PLACING ->                                                                                                                        //(if the player is PLACING we are only interested in getting a toPos (where they want to place the cow))
         let toPos=getPos (sprintf "%s's turn\nWhere do you want to place the cow?" player.Name)
         match isValidMove toPos availableBoard with 
-        | true ->  ('Z',100) , toPos
+        | true ->  ('Z',100) , toPos                                                                                                    //(if it is a valid move, return a tuple of a placeholder value and the tuple representing where the player wnats to place the cow)
         | _ -> printfn "%A is not a valid move" toPos
                getPlayerMove player availableBoard 
     | _ ->
