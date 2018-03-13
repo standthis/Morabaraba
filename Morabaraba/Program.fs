@@ -193,15 +193,14 @@ let getCoords (pos:char*int) = (List.filter (fun x-> x.Pos=pos)startBoard).[0]  
 let rec getPos what =                                                                                                                   //Asks for user input and returns the tuple of the coordinate they entered
     printfn "%s " what
     printf "Row:" 
-    let rowInput = Console.ReadLine()
-    let notEmpty = String.length rowInput > 0
-    let is_char, _ = Char.TryParse(rowInput)
-    //let row= Char.ToUpper(Console.ReadLine().[0])
-    printf "Column: " 
-    let getCol = Console.ReadLine()
+    let rowInput = Console.ReadKey().KeyChar |> string
+    let is_char, row = Char.TryParse(rowInput)
+    printf "\nColumn: " 
+    let getCol = Console.ReadKey().KeyChar |> string 
+    printfn "" //for neatness 
     let is_numeric ,_ = System.Int32.TryParse(getCol)
     match is_numeric && is_char with                                                                                                               //(check if user input for column is an int)
-    | true -> (Char.ToUpper(rowInput.[0]),(int getCol))
+    | true -> (Char.ToUpper(row),(int getCol))
     | _ -> printfn "Row requires a character and Col requires a number. Please enter valid input "
            getPos what
      
@@ -210,7 +209,7 @@ let rec getPlayerMove (player:Player) availableBoard =                          
     | PLACING ->                                                                                                                        //(if the player is PLACING we are only interested in getting a toPos (where they want to place the cow))
         let toPos=getPos (sprintf "%s's turn\nWhere do you want to place the cow?" player.Name)
         match isValidMove toPos availableBoard with 
-        | true ->  ('Z',100) , toPos                                                                                                    //(if it is a valid move, return a tuple of a placeholder value and the tuple representing where the player wnats to place the cow)
+        | true ->  ('Z',100) , toPos   //return a random 'from' pos for placing state cause it's not needed                                                                                                //(if it is a valid move, return a tuple of a placeholder value and the tuple representing where the player wnats to place the cow)
         | _ -> printfn "%A is not a valid move" toPos
                getPlayerMove player availableBoard 
     | _ ->
