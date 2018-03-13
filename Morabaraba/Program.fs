@@ -122,7 +122,7 @@ let decrementPieces (player:Player) = {player with NumberOfPieces = (player.Numb
 
 let changePlayerState (player:Player) newState = { player with PlayerState = newState }                                                 //sets the given player's state to the given state
 
-let addPiece (player:Player) (piece:Coords) = {player with Positions = player.Positions@[piece] }                                       //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
+let addPiece (player:Player) (piece:Coords) = {player with Positions = piece::player.Positions }                                       //adds a given coordinate to the list of positions the given player has cows placed (sets that coordinate to have a cow placed there by this player)
 
 let checkStateChange (player:Player) =                                                                                                  //checks if a given player satisfies the conditions which induce a change of state, and if they do, it returns a new player the same as the given player, but with the new state as it's state
     match player.PlayerState with
@@ -136,12 +136,12 @@ let checkStateChange (player:Player) =                                          
         | _ -> player
     | _ -> player  
         
-let printBoard (board:Coords list) (players:Player list) =                                                                              //prints the board that represents the data given by a list of coordinates and information about the current players given by a player list
+let printBoard (board:Coords list) (p1 : Player) (p2 : Player) =                                                                              //prints the board that represents the data given by a list of coordinates and information about the current players given by a player list
     System.Console.Clear ()
     let ps1, ps2, player1, player2 =
-        match players.[0].ID with
-        | 1 -> '*',' ',players.[0],players.[1]
-        | _ -> ' ','*',players.[1],players.[0]
+        match p1.ID with
+        | 1 -> '*',' ', p1, p2
+        | _ -> ' ','*', p2 , p1
                                                                                                                                         //the hardcoded board structure
     let boardString = sprintf  """
       1   2   3       4      5   6   7
@@ -181,23 +181,28 @@ let filterOutBoard (filterBoard:(Coords list)) (boardToFilterOut:(Coords List)) 
 let getAvailableBoard (board:Coords list):Coords list = List.filter (fun x-> x.Symbol = ' ') board                                      //returns a list of coordinates that represent the epmty spaces on a given board (a given list of coordinates)
     
 let getCurrentBoard (playerPositions:(Coords list)) =                                                                                   //returns a list of coordinates that represent the current board. In other words, it uses the given list (of the two player's coordinates lists combined) and fills in the unused coordinates with the relative coords from the start board.
-    List.map (fun x -> let k = (List.filter (fun y -> y.Pos = x.Pos) playerPositions)
-                       match k.Length with
-                       | 0 -> x
-                       | _ -> {x with Symbol  =  k.[0].Symbol} ) startBoard
+    List.map (fun x -> 
+        let k = (List.filter (fun y -> y.Pos = x.Pos) playerPositions)
+        match k.Length with
+        | 0 -> x
+        | _ -> {x with Symbol  =  k.[0].Symbol} 
+        ) startBoard
   
 let getCoords (pos:char*int) = (List.filter (fun x-> x.Pos=pos)startBoard).[0]                                                          //returns the coordinate whose position is represented by the given tuple
     
 let rec getPos what =                                                                                                                   //Asks for user input and returns the tuple of the coordinate they entered
     printfn "%s " what
     printf "Row:" 
-    let row= Char.ToUpper(Console.ReadLine().[0])
+    let rowInput = Console.ReadLine()
+    let notEmpty = String.length rowInput > 0
+    let is_char, _ = Char.TryParse(rowInput)
+    //let row= Char.ToUpper(Console.ReadLine().[0])
     printf "Column: " 
     let getCol = Console.ReadLine()
     let is_numeric ,_ = System.Int32.TryParse(getCol)
-    match is_numeric with                                                                                                               //(check if user input for column is an int)
-    | true -> (row,(int getCol)) 
-    | _ -> printfn "%A is not a number! Col requires a number " getCol 
+    match is_numeric && is_char with                                                                                                               //(check if user input for column is an int)
+    | true -> (Char.ToUpper(rowInput.[0]),(int getCol))
+    | _ -> printfn "Row requires a character and Col requires a number. Please enter valid input "
            getPos what
      
 let rec getPlayerMove (player:Player) availableBoard =                                                                                  //Begins the move of a given player. Requires a coords list of the current available board to help determine if the move is valid
@@ -212,14 +217,16 @@ let rec getPlayerMove (player:Player) availableBoard =                          
         let fromPos= getPos (sprintf "%s's turn\nWhere do you want to move the cow from?" player.Name)
         match isValidMove fromPos player.Positions with
         | true -> 
-                 let toPos= getPos "Where do you want to move the cow to?"
-                 printfn "%b" (player.PlayerState = FLYING)
-                 match isValidMove toPos availableBoard && ( isValidMove toPos (List.map (fun x -> getCoords x ) (getCoords fromPos).PossibleMoves) || player.PlayerState = FLYING ) with 
-                 | true -> fromPos, toPos
-                 | _ -> printfn "You cannot move from %A to %A" fromPos toPos
-                        getPlayerMove player availableBoard
-        | _ -> printfn "You have no cow at %A" fromPos
-               getPlayerMove player availableBoard 
+            let toPos= getPos "Where do you want to move the cow to?"
+            printfn "%b" (player.PlayerState = FLYING)
+            match isValidMove toPos availableBoard && ( isValidMove toPos (List.map (fun x -> getCoords x ) (getCoords fromPos).PossibleMoves) || player.PlayerState = FLYING ) with 
+            | true -> fromPos, toPos
+            | _ -> 
+                printfn "You cannot move from %A to %A" fromPos toPos
+                getPlayerMove player availableBoard
+        | _ -> 
+            printfn "You have no cow at %A" fromPos
+            getPlayerMove player availableBoard 
 
 let placeMove player pos = 
    addPiece player ({(getCoords pos) with Symbol = player.Symbol }) 
@@ -227,9 +234,12 @@ let placeMove player pos =
                    //use piping when using more functions on the player 
                       
 let movePiece (player:Player) (from:char*int) (to_:char*int)=  //assumes coords passed are valid
-    { player with Positions = List.map (fun x -> match x.Pos=from with 
-                                                  | true -> { x with Pos = to_} 
-                                                  | _ -> x ) player.Positions  } //return the player with new positions
+    { player with Positions = List.map (fun x -> 
+                                            match x.Pos=from with 
+                                            | true -> { x with Pos = to_} 
+                                            | _ -> x 
+                                ) player.Positions  
+    } //return the player with new positions
 
 
 
@@ -274,45 +284,42 @@ let moveExists (player: Player) (availableBoard: Coords List) =
     let possiblePlayerMoves = List.map getCoords (List.fold (fun intial (item:Coords) -> item.PossibleMoves@intial) [] player.Positions)
     (filterOutBoard possiblePlayerMoves availableBoard).Length > 0
 
-let rec runGame (players:Player list) = //pass message saying where player moved or that 
-    //if error don't do next 3 lines error means move was not valid
-    let currentBoard = getCurrentBoard (players.[0].Positions @ players.[1].Positions) //get the state of the board
-    let availableBoard = getAvailableBoard currentBoard
-    // Current player has no moves to play
-    //could use filterOutBoard but it's less efficient and is O(N^2) whilst getAvaiableBoard is O(N)
-    //filterOutBoard (players.[0].Positions @ players.[1].Positions) startBoard  //the avaialble positions 
-
-    printBoard currentBoard players //print the board
-    let fromPos,toPos = getPlayerMove players.[0] availableBoard//the positon the player wants to move to
+let rec runGame (p1 : Player) (p2 : Player) availableBoard currentBoard = //pass message saying where player moved or that 
+    //let currentBoard = getCurrentBoard (p1.Positions @ p2.Positions) //get the state of the board
+    //let availableBoard = getAvailableBoard currentBoard
+    printBoard currentBoard p1 p2 //print the board
+    let fromPos,toPos = getPlayerMove p1 availableBoard//the positon the player wants to move to
     let updatedPlayer =
-        match players.[0].PlayerState with
-        | PLACING -> placeMove players.[0] toPos 
-        | _ -> movePiece players.[0] fromPos toPos // if flying or moving 
+        match p1.PlayerState with
+        | PLACING -> placeMove p1 toPos 
+        | _ -> movePiece p1 fromPos toPos // if flying or moving 
            
     let playerMills= getPlayerMills updatedPlayer
+  
     let updatedEnemyPlayer=
         match isInMill toPos playerMills with
         | true -> 
-                  let newBoard= getCurrentBoard (updatedPlayer.Positions @ players.[1].Positions)
-                  printBoard newBoard [updatedPlayer;players.[1]] 
-                  killCow players.[1] |> checkStateChange 
-        | _ -> players.[1]
+                  printBoard (getCurrentBoard (updatedPlayer.Positions @ p2.Positions)) updatedPlayer p1
+                  killCow p2 |> checkStateChange 
+        | _ -> p2
     
     //check if game should end
-    let movable = moveExists updatedEnemyPlayer availableBoard
+    let newBoard= getCurrentBoard (updatedPlayer.Positions @ updatedEnemyPlayer.Positions)
+    let newAvailableBoard = getAvailableBoard newBoard
+    let movable = moveExists updatedEnemyPlayer newAvailableBoard
     match (updatedEnemyPlayer.Positions.Length=2 && updatedEnemyPlayer.PlayerState=FLYING) || (updatedEnemyPlayer.PlayerState=MOVING && not movable) with
     | true -> 
         match not movable with  
         | true -> noMoveMessage updatedPlayer updatedEnemyPlayer
         | _ -> endGame updatedPlayer//must be pure so let another function print
-    | _ ->  runGame [updatedEnemyPlayer;updatedPlayer] //change player turns
+    | _ ->  runGame updatedEnemyPlayer updatedPlayer newAvailableBoard newBoard  //change player turns
 
 let startGame () = 
-    runGame Players //start the game
+    runGame Player_1 Player_2 startBoard startBoard //start the game
 
 [<EntryPoint>]
 let main argv =
-    printfn "Hello World from F#!"
+    printfn "MORABARABA"
     startGame ()
     Console.ReadKey()
     0 // return an integer exit code
