@@ -281,7 +281,8 @@ let noMoveMessage (winner:Player) (loser:Player) =
     // checks whether a player has any possible moves left to play
 let moveExists (player: Player) (availableBoard: Coords List) = 
     let possiblePlayerMoves = List.map getCoords (List.fold (fun intial (item:Coords) -> item.PossibleMoves@intial) [] player.Positions)
-    (filterOutBoard possiblePlayerMoves availableBoard).Length > 0
+    List.exists (fun possiblePlayerMove -> List.exists (fun openspace -> openspace = possiblePlayerMove) availableBoard) possiblePlayerMoves
+    //(filterOutBoard possiblePlayerMoves availableBoard).Length > 0
 
 let rec runGame (p1 : Player) (p2 : Player) availableBoard currentBoard = //pass message saying where player moved or that 
     //let currentBoard = getCurrentBoard (p1.Positions @ p2.Positions) //get the state of the board
