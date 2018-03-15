@@ -4334,28 +4334,36 @@
     ]
   },
   "packageFolders": {
-    "/Users/Martin/.nuget/packages/": {},
-    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
+    "C:\\Users\\g14d5954\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
+    "restoreSettings": {
+      "hideWarningsAndErrors": true
+    },
     "restore": {
-      "projectUniqueName": "/Users/Martin/Projects/Morabaraba/Morabaraba/Morabaraba.fsproj",
+      "projectUniqueName": "J:\\Morabaraba\\Morabaraba\\Morabaraba.fsproj",
       "projectName": "Morabaraba",
-      "projectPath": "/Users/Martin/Projects/Morabaraba/Morabaraba/Morabaraba.fsproj",
-      "packagesPath": "/Users/Martin/.nuget/packages/",
-      "outputPath": "/Users/Martin/Projects/Morabaraba/Morabaraba/obj",
+      "projectPath": "J:\\Morabaraba\\Morabaraba\\Morabaraba.fsproj",
+      "packagesPath": "C:\\Users\\g14d5954\\.nuget\\packages\\",
+      "outputPath": "J:\\Morabaraba\\Morabaraba\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "/Users/Martin/.config/NuGet/NuGet.Config"
+        "C:\\Users\\g14d5954\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4367,15 +4375,14 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
-          "Microsoft.NETCore.App": {
-            "suppressParent": "All",
-            "target": "Package",
-            "version": "2.0",
-            "autoReferenced": true
-          },
           "FSharp.Core": {
             "target": "Package",
-            "version": "4.2.*"
+            "version": "[4.2.*, )"
+          },
+          "Microsoft.NETCore.App": {
+            "target": "Package",
+            "version": "[2.0.0, )",
+            "autoReferenced": true
           }
         },
         "imports": [

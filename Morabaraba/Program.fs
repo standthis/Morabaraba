@@ -269,21 +269,6 @@ let rec killCow (player: Player) =                                              
         printfn "No valid cow was in pos %A" pos
         killCow player 
 
-    //match isValidMove pos player.Positions with 
-    //| true ->
-    //        let playerMill=getPlayerMills player 
-    //        match isInMill pos playerMill with
-    //        | true ->
-    //                match canKillCowInMill playerMill player with
-    //                | true -> removePiece player (getCoords pos)
-    //                | _ ->  
-    //                    printfn "Can't kill cow in mill unless all cows are in mills" 
-    //                    killCow player
-    //        | _ ->  removePiece player (getCoords pos)
-    //| _ -> 
-        //printfn "No valid cow was in pos %A" pos
-        //killCow player 
-
 let endGame (winner:Player)=
     printfn "Game has ended\n%s won, with %d cows still alive!" winner.Name winner.Positions.Length
 
@@ -326,9 +311,42 @@ let rec runGame (p1 : Player) (p2 : Player) availableBoard currentBoard = //pass
 let startGame () = 
     runGame Player_1 Player_2 startBoard startBoard //start the game
 
+let startMessage = 
+    """
+                            ___  ___                _                     _           
+                            |  \/  |               | |                   | |          
+                            | .  . | ___  _ __ __ _| |__   __ _ _ __ __ _| |__   __ _ 
+                            | |\/| |/ _ \| '__/ _` | '_ \ / _` | '__/ _` | '_ \ / _` |
+                            | |  | | (_) | | | (_| | |_) | (_| | | | (_| | |_) | (_| |
+                            \_|  |_/\___/|_|  \__,_|_.__/ \__,_|_|  \__,_|_.__/ \__,_|
+                                                          
+                                             PRESS ANY KEY TO START              
+                                             
+                                                                                                      
+                                                       
+                                            /~~~~~\        /~~~~~\
+                                           |    (~'        ~~~)   |
+                                            \    \__________/    /
+                                            /~::::::::         ~\
+                                 /~~~~~~~-_| ::::::::             |_-~~~~~~~\
+                                \ ======= /|  ::A::;      A     :|\ ====== /
+                                 ~-_____-~ |  _----------------_::| ~-____-~
+                                           |/~                  ~\|
+                                           /                      \
+                                          (        ()    ()        )
+                                           `\                   ./'
+                                             ~-_______________-~
+                                                   /~~~~\
+                                                  |      |
+                                                  |      |
+                                                 (________)    
+                                                     ()      
+
+    """
 [<EntryPoint>]
 let main argv =
-    printfn "MORABARABA"
+    printfn "%s" startMessage
+    Console.ReadKey()
     startGame ()
     Console.ReadKey()
     0 // return an integer exit code
