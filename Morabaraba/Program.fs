@@ -47,8 +47,6 @@ let Player_2 = {                                                                
     Positions = []
     }
 
-let Players = [Player_1;Player_2]                                                           //list of the two players (used to alternate between the two players depending on whose turn it is)
-
 let A1 = {Pos=('A',1);Symbol=' ';PossibleMoves=[('A',4);('B',2);('D',1)] }                  //all individual board coordinates and their relevant data                          
 let A4 = {Pos=('A',4);Symbol=' ';PossibleMoves=[('A',1);('A',7);('B',4)] } 
 let A7 = {Pos=('A',7);Symbol=' ';PossibleMoves=[('A',4);('B',6);('D',7)] }
@@ -225,8 +223,8 @@ let rec getPlayerMove (player:Player) availableBoard =                          
         match isValidMove fromPos player.Positions with
         | true -> 
             let toPos= getPos "Where do you want to move the cow to?"
-            printfn "%b" (player.PlayerState = FLYING)
-            match isValidMove toPos availableBoard && ( isValidMove toPos (List.map (fun x -> getCoords x ) (getCoords fromPos).PossibleMoves) || player.PlayerState = FLYING ) with 
+            let playerMovingPositions = List.map (fun x -> getCoords x ) (getCoords fromPos).PossibleMoves
+            match isValidMove toPos availableBoard && ( isValidMove toPos playerMovingPositions || player.PlayerState = FLYING ) with 
             | true -> fromPos, toPos
             | _ -> 
                 printfn "You cannot move from %A to %A" fromPos toPos
