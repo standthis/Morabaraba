@@ -239,23 +239,22 @@ let placeMove player pos =                                                      
     addPiece player ({(getCoords pos) with Symbol = player.Symbol }) 
     |> decrementPieces |> checkStateChange
                       
-let movePiece (player:Player) (from:char*int) (to_:char*int) =                                                                          //removes the 'from' coordinate and adds the 'to_' coordinate to the player's list of current coordinates and returns that updated player
+let movePiece (player:Player) (from:char*int) (toPos:char*int) = 
+    let fromPos= getCoords from                                                                       //removes the 'from' coordinate and adds the 'to_' coordinate to the player's list of current coordinates and returns that updated player                            
     let newPositions =
         List.filter (fun (position:Coords) -> 
-            position.Pos <> (getCoords from).Pos
+            position.Pos <> fromPos.Pos
             ) player.Positions
-    { player with Positions = {getCoords to_ with Symbol = player.Symbol}::newPositions }
+    { player with Positions = {getCoords toPos with Symbol = player.Symbol}::newPositions }
 
 let getPlayerMills (player:Player) =                                                                                                    //returns a list of all mills the given player currently has
     List.filter (fun mill -> (filterOutBoard player.Positions mill).Length = 0) allBoardMills
 
 let isInMill toPos playerMills =                                                                                                        //checks if the given position is within one of the given list of mills
-    (List.filter (fun mill -> (List.filter (fun x -> x.Pos=toPos) mill).Length > 0) playerMills).Length 
-    |> (>) 0
+    (List.filter (fun mill -> (List.filter (fun x -> x.Pos=toPos) mill).Length > 0) playerMills).Length>0
 
 let canKillCowInMill (playerMills: list<Coords> list) (player: Player) = 
-    (List.filter (fun x-> isInMill x.Pos playerMills) player.Positions).Length
-    |> (=) player.Positions.Length
+    (List.filter (fun x-> isInMill x.Pos playerMills) player.Positions).Length =player.Positions.Length
     
 
 let rec killCow (player: Player) =                                                                                                      //asks the player which enemy cow they wish to remove and removes it (if it exists) else asks the player again until a valid cow is removed
@@ -282,8 +281,8 @@ let rec killCow (player: Player) =                                              
     //                    killCow player
     //        | _ ->  removePiece player (getCoords pos)
     //| _ -> 
-    //    printfn "No valid cow was in pos %A" pos
-    //    killCow player 
+        //printfn "No valid cow was in pos %A" pos
+        //killCow player 
 
 let endGame (winner:Player)=
     printfn "Game has ended\n%s won, with %d cows still alive!" winner.Name winner.Positions.Length
