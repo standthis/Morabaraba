@@ -277,7 +277,8 @@ let rec killCow (player: Player) =                                              
 
 let endGame (winner: Player) message =                                                                                                    //displays the end game message
     match winner.ID with
-    | 1 -> printfn """
+    | 1 -> printfn "%s" message
+           printfn """
   ____      _         _      __   __U _____ u   ____            _                                  _   _    ____     
 U|  _"\ u  |"|    U  /"\  u  \ \ / /\| ___"|/U |  _"\ u        /"|       __        __     ___     | \ |"|  / __"| u  
 \| |_) |/U | | u   \/ _ \/    \ V /  |  _|"   \| |_) |/      u | |u      \"\      /"/    |_"_|   <|  \| |><\___ \/   
@@ -286,7 +287,8 @@ U|  _"\ u  |"|    U  /"\  u  \ \ / /\| ___"|/U |  _"\ u        /"|       __     
  ||>>_     //  \\  \\    >>.-,//|(_  <<   >>   //   \\_      _//<,-,    .-,_\ /\ /_,-.-,_|___|_,-.||   \\,-.)(  (__) 
 (__)__)   (_")("_)(__)  (__)\_) (__)(__) (__) (__)  (__)    (__)(_/      \_)-'  '-(_/ \_)-' '-(_/ (_")  (_/(__)  
             """
-    | _ -> printfn """
+    | _ ->  printfn "%s" message
+            printfn """
   ____      _         _      __   __U _____ u   ____          ____                                  _   _    ____     
 U|  _"\ u  |"|    U  /"\  u  \ \ / /\| ___"|/U |  _"\ u      |___"\       __        __     ___     | \ |"|  / __"| u  
 \| |_) |/U | | u   \/ _ \/    \ V /  |  _|"   \| |_) |/      U __) |      \"\      /"/    |_"_|   <|  \| |><\___ \/   
@@ -329,8 +331,9 @@ let rec runGame (p1: Player) (p2: Player) availableBoard currentBoard =         
         printBoard newBoard updatedPlayer updatedEnemyPlayer
         endGame updatedPlayer ""                                                                                                        //(game ends if a player is down to 2 cows after having placed all cows)
     | _, { PlayerState = MOVING }, false ->
-        endGame updatedPlayer (sprintf "%s has no moves to play\n. Therefore %s wins the game with %d cows left./n"
-            updatedEnemyPlayer.Name updatedPlayer.Name updatedPlayer.Positions.Length)                                                  //(game ends if the enemy has no possible move to make)
+        printBoard newBoard updatedPlayer updatedEnemyPlayer
+        endGame updatedPlayer (sprintf "%s has no moves to play.\nTherefore %s wins the game with %d cows left."
+        updatedEnemyPlayer.Name updatedPlayer.Name updatedPlayer.Positions.Length)                                                  //(game ends if the enemy has no possible move to make)
     | _ ->  runGame updatedEnemyPlayer updatedPlayer newAvailableBoard newBoard                                                         //(else switch the players positions and send in the updated boards so that the enemy may now have their turn)
 
 //-----------------------------------------end game's core function-------------------------------------------
